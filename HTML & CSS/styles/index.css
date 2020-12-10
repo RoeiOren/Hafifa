@@ -22,10 +22,11 @@ div {
 
 
 .card {
+    font-family: 'Italiana', serif;
     font-size: 2vh;
     width: 30%;
     background-color: white;
-    height: 60vh;
+    height: 50vh;
     position: absolute;
     left:0;
     right:0;
@@ -33,32 +34,61 @@ div {
     margin-right:auto;
     margin-top: 10%;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    padding: 3%;
 }
 
 .card p {
-    font-family: 'Julius Sans One', sans-serif;
     font-size: 4vh;
 }
 
 /* Add some padding inside the card container */
-.container {
-padding: 2px 16px;
-}
-
-#log-in-title {
-    margin-left: 7%;
-}
+/* .container {
+    padding: 2px 16px;
+} */
 
 input {
     font-size: 3vh;
     width: 75%;
     border: 0;
-    margin-left: 12%;
-    padding-top: 2vh;
+    /* margin-left: 12%;
+    padding-top: 2vh; */
 }
 
 hr {
-    width: 75%;
+    width: 100%;
+    margin-bottom: 5%;
+}
+
+input[type="checkbox"] {
+    margin-top: 5%;
+    width: 3vw;
+    height: 3vh;
+}
+
+label {
+    font-size: 150%;
+}
+
+#seperation {
+    margin-top: 10%;
+}
+
+button {    
+    border: none;
+    color: white;
+    padding: 15px 32px;
     text-align: center;
-   
+    text-decoration: none;
+    font-size: 16px;
+    margin-right: 5%;
+    float: right;
+}
+
+#loginBtn {
+    background-color: #4CAF50; /* Green */
+}
+
+#forgotBtn {
+    background-color: white;
+    color: black;
 }
