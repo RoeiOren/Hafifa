@@ -26,7 +26,7 @@ div {
     font-size: 2vh;
     width: 30%;
     background-color: white;
-    height: 50vh;
+    height: 55vh;
     position: absolute;
     left:0;
     right:0;
@@ -34,11 +34,12 @@ div {
     margin-right:auto;
     margin-top: 10%;
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-    padding: 3%;
+    /* padding: 3%; */
 }
 
 .card p {
     font-size: 4vh;
+    margin-left: 5%;
 }
 
 /* Add some padding inside the card container */
@@ -52,25 +53,30 @@ input {
     border: 0;
     /* margin-left: 12%;
     padding-top: 2vh; */
+    margin: 1% 10%;
 }
 
 hr {
-    width: 100%;
+    width: 80%;
     margin-bottom: 5%;
+    text-align: center;
 }
 
 input[type="checkbox"] {
     margin-top: 5%;
+    margin-right: 0;
     width: 3vw;
     height: 3vh;
 }
 
 label {
-    font-size: 150%;
+    font-size: 125%;
 }
 
-#seperation {
-    margin-top: 10%;
+#seperation {  
+    width: 100%;
+    margin: 10% 0 5%;
+    
 }
 
 button {    
