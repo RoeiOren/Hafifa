@@ -1,0 +1,64 @@
+div {
+    width: 100%;
+}
+
+#title {
+    font-family: 'Cinzel', serif;
+    text-align: center;
+    font-size: 5vh;
+    color: white;
+    padding: 5%;
+}
+
+#top {
+    background-color: rgb(105, 98, 98);
+    height: 30vh;
+}
+
+#bottom {
+    background-color: rgb(203, 218, 214);
+    height: 70vh;
+}
+
+
+.card {
+    font-size: 2vh;
+    width: 30%;
+    background-color: white;
+    height: 60vh;
+    position: absolute;
+    left:0;
+    right:0;
+    margin-left:auto;
+    margin-right:auto;
+    margin-top: 10%;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.card p {
+    font-family: 'Julius Sans One', sans-serif;
+    font-size: 4vh;
+}
+
+/* Add some padding inside the card container */
+.container {
+padding: 2px 16px;
+}
+
+#log-in-title {
+    margin-left: 7%;
+}
+
+input {
+    font-size: 3vh;
+    width: 75%;
+    border: 0;
+    margin-left: 12%;
+    padding-top: 2vh;
+}
+
+hr {
+    width: 75%;
+    text-align: center;
+   
+}
