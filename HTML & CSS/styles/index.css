@@ -82,16 +82,17 @@ label {
 button {    
     border: none;
     color: white;
-    padding: 15px 32px;
+    padding: 1vh 1vw;
     text-align: center;
     text-decoration: none;
-    font-size: 16px;
-    margin-right: 5%;
+    font-size: 0.75vw;
+    /* margin-right: 5%; */
     float: right;
 }
 
 #loginBtn {
     background-color: #4CAF50; /* Green */
+    margin-right: 2vw;
 }
 
 #forgotBtn {
