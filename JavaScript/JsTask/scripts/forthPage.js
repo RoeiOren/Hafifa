@@ -9,7 +9,7 @@ window.onload = () => {
 const checkPali = () => {
     const input = document.getElementById("paliIn");
     const str = input.value;
-    input.setAttribute("style", `background-color: ${isPali(str) ? 'green' : 'red'};`)
+    input.setAttribute("style", `background-color: ${isPali(str.toLowerCase()) ? 'green' : 'red'};`)
 }
 
 const isPali = (str) => {
