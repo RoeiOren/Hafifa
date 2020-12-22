@@ -1,0 +1,59 @@
+body { 
+    background: #ffffff;
+    background-image: url("../images/background.jpg");
+    background-position: center;
+    background-size: cover;
+    position: relative;
+}
+
+h1 { 
+    text-align: center;
+    font-size: 400%;
+}
+
+form {
+    text-align: center;
+}
+
+label {
+    margin-left: 2%;
+    font-size: 250%;
+}
+
+input { 
+    margin-right: 2%;
+    font-size: 150%;
+}
+
+#addBtn { 
+    font-size: 200%;
+}
+
+#cardDiv {
+    text-align: center;
+}
+
+.card {
+    /* Add shadows to create the "card" effect */
+    box-shadow: 12px 4px 8px 0 rgba(17, 15, 15, 0.2);
+    display: inline-block;
+    opacity: 1;
+    margin: 1%;
+    padding: 1%;
+    background-color:rgba(0, 0, 0, 0.5);
+    font-size: 200%;
+    text-align: left;
+  }
+  
+  /* On mouse-over, add a deeper shadow */
+  .card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+  }
+
+.delBtn {
+    position: relative;
+    top:0;
+    left:0;
+    background-color: teal;
+    font-size: 100%;
+  } 

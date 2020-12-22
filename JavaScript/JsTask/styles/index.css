@@ -1,0 +1,47 @@
+body { 
+    background: #ffffff;
+    background-image: url("../images/background.jpg");
+    background-position: center;
+    background-size: cover;
+    position: relative;
+}
+
+#time {
+   font-size: 300%;
+}
+
+ul {
+    list-style-type: none;
+}
+
+h1 { 
+    text-align: center;
+    font-size: 400%;
+}
+
+img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%;
+}
+
+#links { 
+    text-align: center;
+}
+
+a {
+    
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    text-decoration: none;
+    color: royalblue;
+
+    margin: 3%;
+
+    text-shadow: 1px 1px;
+
+    font-size: 175%;
+}
