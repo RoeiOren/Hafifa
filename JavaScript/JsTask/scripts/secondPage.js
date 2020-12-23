@@ -41,10 +41,6 @@ const createCard = (name, prof, email) => {
       <p>Email: ${email}</p>
       `
     
-    // Show the delete button events
-    // card.addEventListener('mouseenter', showDelBtn);
-    // card.addEventListener('mouseleave', removeDelBtn);
-
     document.getElementById("cardDiv").appendChild(card);
 
     // The new button (most recent)
