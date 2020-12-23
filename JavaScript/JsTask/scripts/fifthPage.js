@@ -35,7 +35,6 @@ const drawTri = () => {
     const depth = document.getElementById("depthIn").value;
 
     // Darw the big black triangle
-
     context.beginPath();
     context.moveTo(x, y);
 
@@ -50,6 +49,7 @@ const drawTri = () => {
     context.fillStyle = "black";
     context.fill();
 
+    // Removing all the small triangles
     removeTris(x, y + size/2 * Math.sqrt(3), size, depth);
 
 }
