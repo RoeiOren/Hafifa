@@ -35,16 +35,12 @@ const createCard = (name, prof, email) => {
     card.classList.add("card");
     card.innerHTML = 
     `
-      <button class="delBtn" style="visibility: hidden;">X</button>
+      <button class="delBtn">X</button>
       <h4><b>Name: ${name}</b></h4>
       <p>Proffesion: ${prof}</p>
       <p>Email: ${email}</p>
       `
     
-    // Show the delete button events
-    card.addEventListener('mouseenter', showDelBtn);
-    card.addEventListener('mouseleave', removeDelBtn);
-
     document.getElementById("cardDiv").appendChild(card);
 
     // The new button (most recent)
