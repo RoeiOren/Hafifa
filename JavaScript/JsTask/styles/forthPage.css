@@ -4,6 +4,7 @@ body {
     background-position: center;
     background-size: cover;
     position: relative;
+    font-family: 'Langar', cursive;
 }
 
 h1 { 
@@ -23,6 +24,7 @@ h1 {
 input {
     font-size: 70%;
     margin: 2%;
+    font-family: 'Langar', cursive;
 }
 
 textarea { 
@@ -41,10 +43,11 @@ button {
     font-size: 60%;
     display: inline-block;
     margin: 2%;
+    font-family: 'Langar', cursive;
 }
 
 label { 
-    margin: 2%;
+    margin: 1%;
 }
 
 #encAndDecBtns { 

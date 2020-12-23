@@ -4,6 +4,7 @@ body {
     background-position: center;
     background-size: cover;
     position: relative;
+    font-family: 'Langar', cursive;
 }
 
 h1 { 
@@ -17,16 +18,18 @@ form {
 
 label {
     margin-left: 2%;
-    font-size: 250%;
+    font-size: 200%;
 }
 
 input { 
     margin-right: 2%;
     font-size: 150%;
+    font-family: 'Langar', cursive;
 }
 
 #addBtn { 
     font-size: 200%;
+    font-family: 'Langar', cursive;
 }
 
 #cardDiv {
@@ -41,7 +44,7 @@ input {
     margin: 1%;
     padding: 1%;
     background-color:rgba(0, 0, 0, 0.5);
-    font-size: 200%;
+    font-size: 175%;
     text-align: left;
   }
   
