@@ -3,19 +3,6 @@ window.onload = () => {
     document.getElementById("triBtn").addEventListener("click", drawTri);
 }
 
-function resize() {
-    var ratio = canvas.width / canvas.height;
-    var canvas_height = window.innerHeight;
-    var canvas_width = canvas_height * ratio;
-    if(canvas_width>window.innerWidth){
-        canvas_width=window.innerWidth;
-        canvas_height=canvas_width/ratio;
-    }
-
-    canvas.style.width = canvas_width + 'px';
-    canvas.style.height = canvas_height + 'px';
-}
-
 const showFib = () => {
     let numOfElems = document.getElementById("fibIn").value;
     let fibTxt = "";
