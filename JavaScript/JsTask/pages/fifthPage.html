@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/fifthPage.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Langar&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <h1> ALGORITHMS PAGE </h1>
+
+    <div id="fibDiv">
+        <label> Enter the number of elements: </label>
+        <input type="number"  min="2" id="fibIn">
+        <button type="button" id="fibBtn">Calc</button>
+        <label id="seriesLbl"><b>The Fibonacci sereis is:</b></label><br>
+        <p id="seriestxt"></p>
+    </div>
+
+    <br>
+
+    <div id="triDiv">
+        <form id="triForm">
+            <label>Depth: </label>
+            <input type="range" min="1" max="10" value="5" class="slider" id="depthIn">
+            <br><br><br>
+            <label>Size: </label>
+            <input type="range" min="1" max="7" value="4" class="slider" id="sizeIn">
+            <br><br><br>
+            <button type="button" id="triBtn"> Show Sierpiński triangle </button>
+        </form>
+    
+        <canvas id="canvas" width="1000" height="700"></canvas>
+    </div>
+
+    <script type="text/javascript" src="../scripts/fifthPage.js"></script>
+</body>
+</html>
