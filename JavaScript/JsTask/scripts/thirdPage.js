@@ -200,6 +200,9 @@ const someGreaterFunc = () => {
 
 
 const manipulateArrFunc = () => {
+
+    console.log(usersArray);
+
     hideAllCards();
 
     const value = document.getElementById("valIn").value;
@@ -209,6 +212,7 @@ const manipulateArrFunc = () => {
         return;
     }
 
+    // Array on the users' indexes than changes
     const indexesToChange = [];
     usersArray.map((user, index) => {
         if (calcAvg(user.grades) < value && user.address.houseNumber > value) { 
@@ -216,19 +220,36 @@ const manipulateArrFunc = () => {
         }
     })
 
-    console.log(indexesToChange);
+    // Removing all the changed cards
+    for(let i = indexesToChange.length - 1; i >= 0; i--) { 
+        cardsArr.splice(indexesToChange[i], 1);
+    }
 
-    indexesToChange.forEach(index => {
-        cardsArr.splice(index, 1);
-    })
-
+    // Changing the users' data
     indexesToChange.forEach(index => {
         usersArray[index].age += parseInt(value);
         createCard(usersArray[index]);
     })
 
+    // Showing the correct cards
     for(let i = cardsArr.length - indexesToChange.length; i < cardsArr.length; i++) { 
         cardsArr[i].setAttribute("style", "display: inline-block;");
     }
+
+    // Array of the changed users
+    const changedUsers = [];
+    indexesToChange.forEach(index => {
+        changedUsers.push(usersArray[index])
+    });
+
+    // Removing the changed users from the users' array
+    for(let i = changedUsers.length - 1; i >= 0; i--) { 
+        usersArray.splice(indexesToChange[i], 1);
+    }
+
+    // Adding the removed users to the end of the array
+    changedUsers.forEach(user =>{
+        usersArray.push(user);
+    })
 
 }
