@@ -40,7 +40,7 @@ const createCard = (name, prof, email) => {
       <p>Proffesion: ${prof}</p>
       <p>Email: ${email}</p>
       `
-    
+      
     document.getElementById("cardDiv").appendChild(card);
 
     // The new button (most recent)
