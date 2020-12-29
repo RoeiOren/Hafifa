@@ -16,12 +16,14 @@ var bird;
  
 
 window.onload = () => {
+    if (!localStorage.getItem("highScore")) { 
+        localStorage.setItem("highScore", 0);
+    }
     setCanvas();
     initializeGame();
     window.addEventListener("keydown", keyPressed);
     window.addEventListener("resize", setCanvas);
     document.getElementById("canvas").addEventListener("mouseup", handleClick);
-    console.log(bird);
 }
 
 const setImgSrc = (ySpeed, xSpeed) => {
@@ -55,11 +57,18 @@ const initializeGame = () => {
     }
     stopped = false;
     gameStarted = false;
+    setHighScore();
     score = 0;
     fail = false; 
     rightSpikes.splice(0, rightSpikes.length);
     leftSpikes.splice(0, leftSpikes.length);
     clearCanvas();
+}
+
+const setHighScore = () => { 
+    let HighScore = JSON.parse(localStorage.getItem("highScore"));
+    HighScore = Math.max(HighScore, score);
+    localStorage.setItem("highScore", HighScore);
 }
 
 
@@ -102,13 +111,8 @@ const setCanvas = () => {
     canvas.height = window.innerHeight;
 }
 
-const clearCanvas = () => {
-    ctx.fillStyle = "gray";
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
+const drawTopSpikes = () => {
     let x;
-    
-    // Top spikes
     for (let i = 0; i < 8; i++) {
         x = 96 * i;
         ctx.beginPath();
@@ -119,8 +123,10 @@ const clearCanvas = () => {
         ctx.fillStyle = "black";
         ctx.fill();
     }
+}
 
-    // Bottom spikes
+const drawBottomSpikes = () => {
+    let x;
     for (let i = 0; i < 8; i++) { 
         x = 96 * i;
         ctx.beginPath();
@@ -131,43 +137,65 @@ const clearCanvas = () => {
         ctx.fillStyle = "black";
         ctx.fill();
     }
-    
-    if (!gameStarted) { 
-        ctx.font = "750% 'Hanalei Fill', cursive"; 
+}
+
+const drawWelcome = () => {
+    ctx.font = "750% 'Hanalei Fill', cursive"; 
         ctx.textAlign = "center";
         ctx.fillStyle = "blue";
         ctx.fillText("WELCOME", canvas.width/2, canvas.height/4);
+
+        ctx.font = "300% 'Hanalei Fill', cursive";
+        ctx.fillStyle = "white";
+        ctx.strokeText("High Score: " + localStorage.getItem("highScore"), canvas.width/2, canvas.height/2);
 
         ctx.font = "250% 'Hanalei Fill', cursive"; 
         ctx.textAlign = "center";
         ctx.fillStyle = "blue";
         ctx.fillText("Press any key to start", canvas.width/2, canvas.height * 0.75);
+}
 
+const drawStopMenu = () => {
+    ctx.fillStyle = "white";
+    ctx.globalAlpha = 0.5;
+    ctx.fillRect(canvas.width / 4, canvas.height * 0.2, canvas.width / 2, canvas.height * 0.175);
+    ctx.fillRect(canvas.width / 4, canvas.height * 0.55, canvas.width / 2, canvas.height * 0.175);
+    ctx.globalAlpha = 1;
+
+    ctx.fillStyle = "red";
+    ctx.font = "300% 'Hanalei Fill', cursive";
+    ctx.textAlign = "center";
+    ctx.fillText("Resume", canvas.width/2, canvas.height*0.3);
+    ctx.fillText("Restart", canvas.width/2, canvas.height*0.65);
+
+}
+
+const drawScore = () => {
+    ctx.font = "1250% 'Hanalei Fill', cursive";  
+    ctx.textAlign = "center";
+    ctx.strokeText(score, canvas.width/2, canvas.height/2);
+}
+
+const clearCanvas = () => {
+    ctx.fillStyle = "gray";
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    
+    drawTopSpikes();
+    drawBottomSpikes();
+    
+    if (!gameStarted) { 
+        drawWelcome();
     } else {
 
-        if (stopped){
-            ctx.fillStyle = "white";
-            ctx.globalAlpha = 0.5;
-            ctx.fillRect(canvas.width / 4, canvas.height * 0.2, canvas.width / 2, canvas.height * 0.175);
-            ctx.fillRect(canvas.width / 4, canvas.height * 0.55, canvas.width / 2, canvas.height * 0.175);
-            ctx.globalAlpha = 1;
-
-            ctx.fillStyle = "red";
-            ctx.font = "300% 'Hanalei Fill', cursive";
-            ctx.textAlign = "center";
-            ctx.fillText("Resume", canvas.width/2, canvas.height*0.3);
-            ctx.fillText("Restart", canvas.width/2, canvas.height*0.65);
-
+        if (stopped) {
+            drawStopMenu();
         } else {
-            ctx.font = "1250% 'Hanalei Fill', cursive";  
-            ctx.textAlign = "center";
-            ctx.strokeText(score, canvas.width/2, canvas.height/2);
+            drawScore();
         }
- 
 
         if(!fail) { 
             if (bird.xSpeed > 0) { 
-                for (let i = 0; i < rightSpikes.length; i++) { 
+                for (let i = 0; i < rightSpikes.length; i++) {
                     ctx.beginPath();
                     ctx.moveTo(rightSpikes[i].x, rightSpikes[i].y);
                     ctx.lineTo(canvas.width, rightSpikes[i].y + 45);
@@ -196,12 +224,13 @@ const updateGame = () => {
     bird.draw();
     bird.updateYSpeed();
     bird.updatePos();
-} 
+}
 
 const startGame = () => {
     myInterval = setInterval(updateGame, 1000 / 60);
     
 }
+
 
 const keyPressed = (event) => {
     if (!gameStarted) {
@@ -219,7 +248,7 @@ const keyPressed = (event) => {
                 startGame();
             }
         } else { 
-            if (!fail) { 
+            if (!fail && !stopped && event.key === " ") { 
                 bird.flyUp();
             }
         }
