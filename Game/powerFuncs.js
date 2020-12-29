@@ -3,31 +3,31 @@ var speedRatio;
 var gravityRatio;
 
 
-const getSmaller = () => {
+const activateSmaller = () => {
     sizeRatio = 0.65;
 }
 
-const getBigger = () => {
+const activateBigger = () => {
     sizeRatio = 1.25;
 }
 
-const getFaster = () => {
+const activateFaster = () => {
     speedRatio = 1.25;
 }
 
-const getSlower = () => {
+const activateSlower = () => {
     speedRatio = 0.6;
 }
 
-const strongerGravity = () => {
+const activateStrongerGravity = () => {
     gravityRatio = 1.25;
 }
 
-const weakerGravity = () => {
+const activateWeakerGravity = () => {
     gravityRatio = 0.75;
 }
 
-const powersArr = [getSmaller, getBigger, getFaster, getSlower, strongerGravity, weakerGravity];
+const powersArr = [activateSmaller, activateBigger, activateFaster, activateSlower, activateStrongerGravity, activateWeakerGravity];
 
 const resetAllProp = () => {
     sizeRatio = 1;

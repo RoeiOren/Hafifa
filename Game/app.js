@@ -188,6 +188,7 @@ const updateGame = () => {
 }
 
 const activateRandomPower = () => { 
+    resetAllProp();
     let index = Math.floor(Math.random() * powersArr.length);
     powersArr[index]();
 }

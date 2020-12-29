@@ -41,11 +41,6 @@ const drawWelcome = () => {
     ctx.fillStyle = "blue";
     ctx.fillText("Press any key to start", canvas.width/2, canvas.height * 0.75);
 
-    // ctx.fillStyle = "white";
-    // ctx.globalAlpha = 0.2;
-    // ctx.fillRect(canvas.width * 0.075, canvas.height * 0.8, canvas.width * 0.2, canvas.height * 0.085);
-    // ctx.globalAlpha = 1;
-
     ctx.font = "150% 'Hanalei Fill', cursive";
     ctx.textAlign = "center";
     ctx.fillStyle = "black";
@@ -100,15 +95,15 @@ const drawLeftSpikes = () =>{
 const drawInstructions = () => {
     ctx.fillStyle = "lightskyblue";
 
-    ctx.fillRect(canvas.width / 8, canvas.height * 0.35, canvas.width * 0.75, canvas.height * 0.35);
+    ctx.fillRect(canvas.width / 8, canvas.height * 0.3, canvas.width * 0.75, canvas.height * 0.4);
     const msg = "INSTRUCTION \nThe goal of this game is to survive \nYou get point by touching the walls" + 
-                "\nPress space to fly up \nYou will fail by touching the spikes";
+                "\nPress space to fly up \nYou will fail by touching the spikes \nThe blue rects activate a special power";
     ctx.fillStyle = "black";
     ctx.font = "175% 'Hanalei Fill', cursive";
     ctx.textAlign = "center";
     //ctx.fillText(msg, canvas.width * 0.25, canvas.height * 0.4);
     var x = canvas.width * 0.5;
-    var startY = canvas.height * 0.4;
+    var startY = canvas.height * 0.35;
     var lineHeight = 60;
     var lines = msg.split('\n');
 
