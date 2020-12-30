@@ -28,6 +28,8 @@ class Bird {
         this.x += (this.xSpeed * speedRatio);
         if (!fail) { 
             if (this.xSpeed > 0) {
+
+                // Check if there is a collision with the spikes on the wall
                 if (rightSpikes.filter(spike => {
                     return this.x + this.width * sizeRatio >= canvas.width && checkYCollision(this, spike);
                 }).length > 0) {
@@ -35,6 +37,7 @@ class Bird {
                     this.ySpeed = -(canvas.height / 48.5);
                 }
             } else {
+                // Check if there is a collision with the spikes on the wall
                 if (leftSpikes.filter(spike => {
                     return this.x <= 0 && checkYCollision(this, spike);
                 }).length > 0) {
@@ -42,6 +45,8 @@ class Bird {
                     this.ySpeed = -(canvas.height / 48.5); 
                 }
             }
+
+            //Check if there is collision with the spike at the top or bottom
             if (this.y <= VERTICAL_SPIKE_HEIGHT / 2 || this.y + this.height * sizeRatio >= canvas.height - (VERTICAL_SPIKE_HEIGHT / 2)) { 
                 fail = true;
                 if (this.y > VERTICAL_SPIKE_HEIGHT / 2) { 
@@ -53,7 +58,9 @@ class Bird {
                 clearInterval(myInterval);
                 initializeGame();
             }
-        }    
+        }
+
+        // Switch side
         if (this.x + this.width * sizeRatio >= canvas.width || this.x < 0) { 
             this.xSpeed *= -1;
             if (!fail) { 
@@ -65,6 +72,8 @@ class Bird {
                     power = new Power(x, y);
                 }
             }
+
+            // Increase x speed
             if (score !== 0 && score % 10 === 0 && score <= 40) { 
                 this.xSpeed += canvas.width / 770; 
             }
@@ -77,6 +86,8 @@ class Bird {
 
     draw() {
         ctx.save();
+
+        // Draw the rotating bird
         if (fail) {
             ctx.save();
             ctx.setTransform(0.0033 * this.width, 0, 0, 0.0033 * this.width, this.x, this.y);

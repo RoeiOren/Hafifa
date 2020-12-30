@@ -66,7 +66,7 @@ const initializeGame = () => {
     rightSpikes.splice(0, rightSpikes.length);
     leftSpikes.splice(0, leftSpikes.length);
     power = undefined;
-    clearCanvas();
+    drawCanvas();
 }
 
 const setHighScore = () => {
@@ -78,12 +78,14 @@ const setHighScore = () => {
 }
 
 
+// Check if there is a coliision between the bird and the spike in the Y axis
 const checkYCollision = (bird, spike) => { 
         return ((bird.y + (bird.height / 2) * sizeRatio < spike.y + SPIKE_HEIGHT / 2 && bird.y + (bird.height / 2) * sizeRatio > spike.y - SPIKE_HEIGHT / 2) ||
                 (bird.y < spike.y + SPIKE_HEIGHT / 2 && bird.y > spike.y - SPIKE_HEIGHT / 2) || 
                 (bird.y + bird.height * sizeRatio < spike.y + SPIKE_HEIGHT / 2 && bird.y + bird.height * sizeRatio > spike.y + SPIKE_HEIGHT / 2));
 }
  
+// Fill the spikes' arrays
 const createSpikes = (xSpeed) => {
     let quantity;
     if (score < 8) { 
@@ -101,6 +103,7 @@ const createSpikes = (xSpeed) => {
     }
 }
 
+// Fill the right spikes' array
 const createRightSpikes = (arr) => {
     rightSpikes.splice(0, rightSpikes.length);
         for (let i = 0; i < arr.length; i++){
@@ -109,6 +112,7 @@ const createRightSpikes = (arr) => {
         }
 }
 
+// Fill the small spikes' array
 const createLeftSpikes = (arr) => {
     leftSpikes.splice(0, leftSpikes.length);
     for (let i = 0; i < arr.length; i++){
@@ -118,12 +122,12 @@ const createLeftSpikes = (arr) => {
 }
 
 const setCanvas = () => { 
-    var canvas = document.getElementById('canvas');
     canvas.height = window.innerHeight;
     canvas.width = 0.7 * canvas.height;  
 }
 
-const clearCanvas = () => {
+
+const drawCanvas = () => {
     ctx.fillStyle = CalcBackColor();
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     
@@ -171,7 +175,7 @@ const CalcBackColor = () => {
 }
  
 const updateGame = () => {
-    clearCanvas(); 
+    drawCanvas(); 
     bird.draw();
     bird.updateYSpeed();
     bird.updatePos();
@@ -205,7 +209,7 @@ const keyPressed = (event) => {
             if (!stopped)  {
                 stopped = true;
                 clearInterval(myInterval);
-                clearCanvas();
+                drawCanvas();
                 bird.draw();
             } else {
                 stopped = false;
@@ -241,11 +245,11 @@ const handleClick = (event) => {
             && event.pageY > canvas.height * 0.8 && event.pageY < canvas.height * 0.885) {
             if(!openedIns) {
                 openedIns = true;
-                clearCanvas();
+                drawCanvas();
                 drawInstructions();
             } else { 
                 openedIns = false;
-                clearCanvas();
+                drawCanvas();
             }
         }
     } else {
