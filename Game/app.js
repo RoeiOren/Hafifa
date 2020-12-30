@@ -1,7 +1,6 @@
-const GRAVITY = 0.55;
-const FAIL_GRAVITY = 0.8;
+const GRAVITY = window.innerHeight / 1762 ;
+const FAIL_GRAVITY = window.innerHeight / 1212;
 const IMG_URL = "../images/";
-const SPIKE_HEIGHT = 60;
 
 const rightSpikes = [];
 const leftSpikes = [];
@@ -31,17 +30,17 @@ window.onload = () => {
 
 const setImgSrc = (ySpeed, xSpeed) => {
     let src = "";
-    if (ySpeed > 12 * gravityRatio) {
+    if (ySpeed > (window.innerHeight / 80) * gravityRatio) {
         src = "1";
-    } else if (ySpeed > 8 * gravityRatio) {
+    } else if (ySpeed > (window.innerHeight / 121) * gravityRatio) {
         src = "2";
-    } else if (ySpeed > 4 * gravityRatio) { 
+    } else if (ySpeed > (window.innerHeight / 242) * gravityRatio) { 
         src = "3";
-    } else if (ySpeed > 0 * gravityRatio) { 
+    } else if (ySpeed > 0 * gravityRatio) {
         src = "4";
-    } else if (ySpeed > -3 * gravityRatio) { 
+    } else if (ySpeed > -(window.innerHeight / 323) * gravityRatio) { 
         src = "5";
-    } else if (ySpeed > -6 * gravityRatio) { 
+    } else if (ySpeed > -(window.innerHeight / 161) * gravityRatio) { 
         src = "6";
     } else {
         src = "7";
@@ -80,9 +79,9 @@ const setHighScore = () => {
 
 
 const checkYCollision = (bird, spike) => { 
-        return ((bird.y + (bird.height / 2) * sizeRatio < spike.y + spike.height / 2 && bird.y + (bird.height / 2) * sizeRatio > spike.y - spike.height / 2) ||
-                (bird.y < spike.y + spike.height / 2 && bird.y > spike.y - spike.height / 2) || 
-                (bird.y + bird.height * sizeRatio < spike.y + spike.height / 2 && bird.y + bird.height * sizeRatio > spike.y + spike.height / 2));
+        return ((bird.y + (bird.height / 2) * sizeRatio < spike.y + SPIKE_HEIGHT / 2 && bird.y + (bird.height / 2) * sizeRatio > spike.y - SPIKE_HEIGHT / 2) ||
+                (bird.y < spike.y + SPIKE_HEIGHT / 2 && bird.y > spike.y - SPIKE_HEIGHT / 2) || 
+                (bird.y + bird.height * sizeRatio < spike.y + SPIKE_HEIGHT / 2 && bird.y + bird.height * sizeRatio > spike.y + SPIKE_HEIGHT / 2));
 }
  
 const createSpikes = (xSpeed) => {
@@ -105,7 +104,7 @@ const createSpikes = (xSpeed) => {
 const createRightSpikes = (arr) => {
     rightSpikes.splice(0, rightSpikes.length);
         for (let i = 0; i < arr.length; i++){
-            let spike = new Spike(canvas.width - 50, arr[i] * 110);
+            let spike = new Spike(canvas.width - SPIKE_WIDTH, arr[i] * (canvas.height / 8.8));
             rightSpikes.push(spike);
         }
 }
@@ -113,15 +112,15 @@ const createRightSpikes = (arr) => {
 const createLeftSpikes = (arr) => {
     leftSpikes.splice(0, leftSpikes.length);
     for (let i = 0; i < arr.length; i++){
-        let spike = new Spike(50, arr[i] * 110);
+        let spike = new Spike(SPIKE_WIDTH, arr[i] * (canvas.height / 8.8));
         leftSpikes.push(spike);
     }
 }
 
 const setCanvas = () => { 
     var canvas = document.getElementById('canvas');
-    canvas.width = window.innerWidth * 0.4;  
     canvas.height = window.innerHeight;
+    canvas.width = 0.7 * canvas.height;  
 }
 
 const clearCanvas = () => {
@@ -176,7 +175,7 @@ const updateGame = () => {
     bird.draw();
     bird.updateYSpeed();
     bird.updatePos();
-    if (power) { 
+    if (power) {
         power.draw();
         if  (bird.isPointCollision(power.x, power.y) || bird.isPointCollision(power.x + power.width, power.y)
             || bird.isPointCollision(power.x, power.y + power.height) || bird.isPointCollision(power.x + power.width, power.y + power.height)) { 
@@ -187,15 +186,14 @@ const updateGame = () => {
     }
 }
 
-const activateRandomPower = () => { 
+const activateRandomPower = () => {
     resetAllProp();
     let index = Math.floor(Math.random() * powersArr.length);
     powersArr[index]();
 }
 
 const startGame = () => {
-    myInterval = setInterval(updateGame, 1000 / 60);
-    
+    myInterval = setInterval(updateGame, 1000 / 60);  
 }
 
 const keyPressed = (event) => {

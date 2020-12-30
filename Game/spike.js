@@ -1,8 +1,9 @@
+const SPIKE_HEIGHT = window.innerHeight / 10.7;
+const SPIKE_WIDTH = window.innerHeight * 0.7 / 15.4;
+
 class Spike {
-    constructor(x, y, width, height) {
+    constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.width = 50;
-        this.height = 90;
     }
 }
