@@ -1,6 +1,6 @@
 const GRAVITY = window.innerHeight / 1762 ;
 const FAIL_GRAVITY = window.innerHeight / 1212;
-const IMG_URL = "../images/";
+const IMG_URL = "./images/";
 
 const rightSpikes = [];
 const leftSpikes = [];
