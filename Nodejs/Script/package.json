@@ -1,0 +1,20 @@
+{
+  "name": "script",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "file_generator": "node ex1.js 3 4",
+    "jokes": "node ex2.js",
+    "file_mover": "node ex3.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "fs-extra": "^9.0.1",
+    "one-liner-joke": "^1.2.0",
+    "rimraf": "^3.0.2"
+  }
+}
