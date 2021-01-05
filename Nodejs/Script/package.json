@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "file_generator": "node ex1.js 3 4",
     "jokes": "node ex2.js",
-    "file_mover": "node ex3.js"
+    "file_mover": "node ex3.js",
+    "final_task": "node ./finalTask/final.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +16,8 @@
     "dotenv": "^8.2.0",
     "fs-extra": "^9.0.1",
     "one-liner-joke": "^1.2.0",
+    "prompt": "^1.1.0",
+    "prompt-sync": "^4.2.0",
     "rimraf": "^3.0.2"
   }
 }
