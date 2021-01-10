@@ -11,7 +11,6 @@ const createTextIndex = (db) => {
     db.collection('books').createIndex({
         name: "text",
         description: "text",
-        releaseDate: "text",
         writer: "text"
     });
 }
@@ -24,23 +23,30 @@ const createBookDoc = (db) => {
     db.collection('books').insertMany([{
         name: "First",
         description: "The first book in the collection",
-        releaseDate: "1/1/2021",
+        releaseDate: new Date(2016, 1, 1,),
         writer: "Roei Oren",
         pages: 300
     },
     {
         name: "Second",
         description: "The second book in the collection",
-        releaseDate: "1/1/2021",
-        writer: "Roei Oren",
+        releaseDate: new Date(2017, 1, 1),
+        writer: "Poei Oren",
         pages: 275
     },
     {
         name: "Third",
         description: "The third book in the collection",
-        releaseDate: "1/1/2021",
+        releaseDate: new Date(2014, 1, 1),
         writer: "Roei Oren",
-        pages: 200
+        pages: 250
+    },
+    {
+        name: "Forth",
+        description: "The forth book in the collection",
+        releaseDate: new Date(2018, 1, 1),
+        writer: "Poei Oren",
+        pages: 300
     },
     ]);
 }
@@ -87,6 +93,29 @@ const booksByPages = (db) => {
     });
 }
 
+const createWriterAndPagesIndex = (db) => {
+    db.collection('books').createIndex({
+        writer: 1,
+        pages: 1
+    });
+}
+
+const aggregationQurey = (db) => {
+    db.collection('books').aggregate([
+        { $match: {
+            pages : {$gt: 200}, 
+            $and: [{releaseDate: {$gte: new Date(2015, 1, 1)}}, {releaseDate: {$lt: new Date(2021, 1, 1)}}],
+            writer: /^P/
+        } },
+        {$project: {name: 1, writer: 1, _id: 0}},
+        {$sort: {writer: 1, pages: 1}}
+    ]).toArray(function(err, docs) {
+        assert.equal(err, null);
+        console.log("Found the following records");
+        console.log(docs);
+    });
+}
+
  
 // Use connect method to connect to the server
 MongoClient.connect(url, function(err, client) {
@@ -101,11 +130,15 @@ MongoClient.connect(url, function(err, client) {
   createWriterDoc(db);
 
 
-  allWriterBooks(db, "Roei Oren");
+//   allWriterBooks(db, "Roei Oren");
 
-  findBook(db, "first book");
+//   findBook(db, "first book");
 
-  booksByPages(db);
+//   booksByPages(db);
+
+  createWriterAndPagesIndex(db);
+
+  aggregationQurey(db);
 
   client.close();
  
