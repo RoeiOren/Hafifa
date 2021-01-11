@@ -1,6 +1,12 @@
 import express from "express";
+import bodyParser from "body-parser";
+
+
 const app = express();
 const port = 8080; // default port to listen
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // define a route handler for the default home page
 app.get( "/", ( req, res ) => {
