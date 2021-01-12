@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 const mongoose_1 = __importDefault(require("mongoose"));
 const userSchema = new mongoose_1.default.Schema({
     name: String,
-    fatherGroup: Number,
+    fatherGroup: String,
     subGroups: Array,
     persons: Array
 }, {

@@ -27,3 +27,11 @@ export const addPersonToGroup = (groupName: string, personID: number) => {
 export const removePersonFromGroup = (groupName: string, personID: number) => {
     return groupModel.updateOne({name: groupName}, {$pull: {persons: personID}});
 }
+
+export const addGroupToSub = (groupName: string, subGroupName: string) => {
+    return groupModel.updateOne({name: groupName}, {$push: {subGroups: subGroupName}});
+}
+
+export const removeSubGroup = (groupName: string, subGroupName: string) => {
+    return groupModel.updateOne({name: groupName}, {$pull: {subGroups: subGroupName}});
+}

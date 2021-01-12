@@ -23,6 +23,14 @@ db.on("error", () => {
     console.error.bind(console, "connection error:");
 });
 db.once("open", () => {
+    // Text index for persons
+    db.collection('persons').createIndex({
+        firstName: "text",
+        lastName: "text",
+        phoneNumber: "text"
+    });
+    // text index for groups
+    db.collection('groups').createIndex({ name: "text", fatherGroup: "text" });
     app.listen(port, () => {
         // tslint:disable-next-line:no-console
         console.log(`listening at http://localhost:${port}`);

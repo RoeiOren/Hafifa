@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -24,7 +15,7 @@ router.get('/', (req, res) => {
     });
 });
 // get by id
-router.get('/id/:id', (req, res) => {
+router.get('/:id', (req, res) => {
     person_service_1.getById(req.params.id).then((person, err) => {
         if (err) {
             res.status(500).send(err.message);
@@ -33,8 +24,8 @@ router.get('/id/:id', (req, res) => {
     });
 });
 // get by name
-router.get('/name/:name', (req, res) => {
-    person_service_1.getByFirstName(req.params.name).then((person, err) => {
+router.get('/:firstName/:lastName', (req, res) => {
+    person_service_1.getByFirstNameAndLastName(req.params.firstName, req.params.lastName).then((person, err) => {
         if (err) {
             res.status(500).send(err.message);
         }
@@ -42,21 +33,21 @@ router.get('/name/:name', (req, res) => {
     });
 });
 // add person
-router.post('/add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    person_service_1.addPerson(req.body).then((user, err) => {
+router.post('/', (req, res) => {
+    person_service_1.addPerson(req.body).then((person, err) => {
         if (err) {
-            return console.error(err);
+            res.status(500).send(err.message);
         }
         else {
-            res.send(user);
+            res.send(person);
         }
     });
-}));
+});
 // update person
-router.put('/changePhone', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.put('/changePhone', (req, res) => {
     person_service_1.getByFirstNameAndLastName(req.body.firstName, req.body.lastName).then((person, err) => {
         if (err) {
-            return console.error(err);
+            res.status(500).send(err.message);
         }
         else {
             person.phoneNumber = req.body.phoneNumber;
@@ -64,12 +55,12 @@ router.put('/changePhone', (req, res) => __awaiter(void 0, void 0, void 0, funct
             res.status(200).send();
         }
     });
-}));
+});
 // delete person
-router.delete('/delete', (req, res) => {
+router.delete('/', (req, res) => {
     return person_service_1.deletePerson(req.body).then((result, err) => {
         if (err) {
-            return console.error(err);
+            res.status(500).send(err.message);
         }
         else {
             res.send(result);

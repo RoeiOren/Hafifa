@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema(
+const groupSchema = new mongoose.Schema(
   {
     name: String,
-    fatherGroup: Number,
+    fatherGroup: String,
     subGroups: Array,
     persons: Array
   },
@@ -12,4 +12,4 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-export = mongoose.model("groups", userSchema);
+export = mongoose.model("groups", groupSchema);

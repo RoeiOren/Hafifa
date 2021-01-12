@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema(
+const personSchema = new mongoose.Schema(
   {
     firstName: String,
     lastName: String,
@@ -11,4 +11,4 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-export = mongoose.model("persons", userSchema);
+export = mongoose.model("persons", personSchema);
