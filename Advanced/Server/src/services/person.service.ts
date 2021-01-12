@@ -8,10 +8,6 @@ export const getById = (id: string) => {
     return personModel.findOne({_id: id});
 }
 
-export const getByFirstName = (firstName: string) => {
-    return personModel.find({firstName: firstName});
-}
-
 export const getByFirstNameAndLastName = (firstName: string, lastName: string) => {
     return personModel.findOne({firstName: firstName, lastName: lastName});
 }

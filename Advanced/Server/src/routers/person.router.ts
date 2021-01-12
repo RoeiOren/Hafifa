@@ -1,5 +1,5 @@
 import express from "express";
-import { getAll, addPerson, getByFirstName, getById, deletePerson, getByFirstNameAndLastName } from "../services/person.service";
+import { getAll, addPerson, getById, deletePerson, getByFirstNameAndLastName } from "../services/person.service";
 
 const router = express.Router();
 
@@ -16,7 +16,7 @@ router.get('/', (req, res) => {
 })
 
 // get by id
-router.get('/id/:id', (req, res) => {
+router.get('/:id', (req, res) => {
     getById(req.params.id).then((person: any, err?: any) => {
         if (err) {
             res.status(500).send(err.message);
@@ -27,8 +27,8 @@ router.get('/id/:id', (req, res) => {
 })
 
 // get by name
-router.get('/name/:name', (req, res) => {
-    getByFirstName(req.params.name).then((person: any, err?: any) => {
+router.get('/:firstName/:lastName', (req, res) => {
+    getByFirstNameAndLastName(req.params.firstName, req.params.lastName).then((person: any, err?: any) => {
         if (err) {
             res.status(500).send(err.message);
         }
@@ -39,11 +39,11 @@ router.get('/name/:name', (req, res) => {
 
 // add person
 router.post('/', (req, res) => {
-    addPerson(req.body).then((user: any, err?: any) => {
+    addPerson(req.body).then((person: any, err?: any) => {
         if (err) {
-            return console.error(err);
+            res.status(500).send(err.message);
         } else {
-            res.send(user);
+            res.send(person);
         }
     })
 })
@@ -52,7 +52,7 @@ router.post('/', (req, res) => {
 router.put('/changePhone', (req, res) => {
     getByFirstNameAndLastName(req.body.firstName, req.body.lastName).then((person: any, err?: any) => {
         if (err) { 
-            return console.error(err);
+            res.status(500).send(err.message);
         } else {
             person.phoneNumber = req.body.phoneNumber;
             person.save();
@@ -65,7 +65,7 @@ router.put('/changePhone', (req, res) => {
 router.delete('/', (req, res) => {
     return deletePerson(req.body).then((result: any, err?: any) => {
         if (err) {
-            return console.error(err);
+            res.status(500).send(err.message);
         } else {
             res.send(result);
         }
