@@ -35,3 +35,11 @@ export const addGroupToSub = (groupName: string, subGroupName: string) => {
 export const removeSubGroup = (groupName: string, subGroupName: string) => {
     return groupModel.updateOne({name: groupName}, {$pull: {subGroups: subGroupName}});
 }
+
+export const personInGroup = (groupName: string, personID: number) => {
+    return groupModel.findOne({name: groupName, persons: personID});
+}
+
+export const groupInGroup = (groupName: string, subGroupName: string) => {
+    return groupModel.findOne({name: groupName, subGroups: subGroupName});
+}

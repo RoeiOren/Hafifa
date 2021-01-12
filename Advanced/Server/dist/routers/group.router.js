@@ -65,11 +65,18 @@ router.post('/addPerson', (req, res) => __awaiter(void 0, void 0, void 0, functi
     console.log(req.body);
     const personToAdd = yield person_service_1.getByFirstNameAndLastName(personData.firstName, personData.lastName);
     if (personToAdd) {
-        group_service_1.addPersonToGroup(groupName, personToAdd._id).then((result, err) => {
-            if (err) {
-                res.status(500).send(err.message);
+        group_service_1.isPesronInGroup(groupName, personToAdd._id).then((user, err) => {
+            if (user) {
+                res.status(500).send("User already in group");
             }
-            res.send(result);
+            else {
+                group_service_1.addPersonToGroup(groupName, personToAdd._id).then((result, err) => {
+                    if (err) {
+                        res.status(500).send(err.message);
+                    }
+                    res.send(result);
+                });
+            }
         });
     }
     else {
