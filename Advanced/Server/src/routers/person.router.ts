@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
 })
 
 // get by id
-router.get('/:personID', (req, res) => {
+router.get('/:id', (req, res) => {
 
 })
 
@@ -31,8 +31,8 @@ router.put('/update', async (req, res) => {
 
 // delete person
 router.delete('/delete', (req, res) => {
-    
+
 })
 
 
-module.exports = router;
+export = router;

@@ -1,12 +1,12 @@
-const getAll = () => {
+export const getAll = () => {
 
 }
 
-const getById = (id) => {
+const getById = (id: number) => {
 
 }
 
-const getByName = (name) => {
+const getByName = (name: string) => {
 
 }
 
@@ -20,9 +20,4 @@ const updatePerson = (updatedPerson) => {
 
 const deletePerson = (personToDelete) => {
 
-}
-
-
-module.exports = {
-    getAll,
 }
