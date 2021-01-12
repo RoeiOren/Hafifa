@@ -27,5 +27,5 @@ export const addPersonToGroup = (personID: number) => {
 }
 
 export const removePersonFromGroup = (personID: number) => {
-    
+
 }

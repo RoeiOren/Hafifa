@@ -1,11 +1,15 @@
 import express from "express";
 import bodyParser from "body-parser";
+import mongoose from "mongoose";
+import dotenv from 'dotenv';
 
 import personRouter from "./routers/person.router";
 import groupRouter from "./routers/group.router";
 
+dotenv.config();
+
 const app = express();
-const port = 8080; // default port to listen
+const port = 9000; // default port to listen
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -13,13 +17,18 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/persons', personRouter);
 app.use('/groups', groupRouter);
 
-// define a route handler for the default home page
-app.get( "/", ( req, res ) => {
-    res.send( "Hello world!" );
-} );
+mongoose.connect(
+    `mongodb+srv://RoeiHafifa:${process.env.DB_PASS}@backendtask.diqjo.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
+  );
+const db = mongoose.connection;
 
-// start the Express server
-app.listen( port, () => {
-     // tslint:disable-next-line:no-console
-    console.log( `server started at http://localhost:${ port }` );
-} );
+db.on("error", () => {
+    // tslint:disable-next-line:no-console
+    console.error.bind(console, "connection error:")
+});
+db.once("open", () => {
+    app.listen(port, () => {
+        // tslint:disable-next-line:no-console
+        console.log(`listening at http://localhost:${port}`);
+    });
+});

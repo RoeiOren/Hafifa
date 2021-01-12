@@ -1,23 +1,25 @@
+import personModel from '../models/person.model';
+
 export const getAll = () => {
-
+    return personModel.find();
 }
 
-const getById = (id: number) => {
-
+export const getById = (id: string) => {
+    return personModel.findOne({_id: id});
 }
 
-const getByName = (name: string) => {
-
+export const getByFirstName = (firstName: string) => {
+    return personModel.find({firstName: firstName});
 }
 
-const addPerson = (newPerson) => {
-
+export const getByFirstNameAndLastName = (firstName: string, lastName: string) => {
+    return personModel.findOne({firstName: firstName, lastName: lastName});
 }
 
-const updatePerson = (updatedPerson) => {
-
+export const addPerson = (newPerson: any) => {
+    return personModel.create(newPerson);
 }
 
-const deletePerson = (personToDelete) => {
-
+export const deletePerson = (personToDelete: any) => {
+    return personModel.remove({ firstName:  personToDelete.firstName, lastName:personToDelete.lastName});
 }
