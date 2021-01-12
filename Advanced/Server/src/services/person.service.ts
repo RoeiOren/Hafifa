@@ -1,4 +1,4 @@
-const getAll = () => {
+export const getAll = () => {
 
 }
 
@@ -20,9 +20,4 @@ const updatePerson = (updatedPerson) => {
 
 const deletePerson = (personToDelete) => {
 
-}
-
-
-module.exports = {
-    getAll,
 }
