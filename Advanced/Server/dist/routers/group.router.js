@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12,106 +31,221 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 const express_1 = __importDefault(require("express"));
-const group_service_1 = require("../services/group.service");
+const groupService = __importStar(require("../services/group.service"));
 const person_service_1 = require("../services/person.service");
+let groupsDeleted = 0;
 const router = express_1.default.Router();
 // get all groups
 router.get('/', (req, res) => {
-    group_service_1.getAll().then((groups, err) => {
+    groupService.getAll().then((groups, err) => {
         if (err) {
             res.status(500).send(err.message);
         }
-        res.send(groups);
+        else {
+            res.send(groups);
+        }
     });
 });
 // get by group name
 router.get('/:name', (req, res) => {
-    group_service_1.getByName(req.params.name).then((group, err) => {
+    groupService.getByName(req.params.name).then((group, err) => {
         if (err) {
             res.status(500).send(err.message);
         }
-        res.send(group);
+        if (!group) {
+            res.status(406).send("Group not found");
+        }
+        else {
+            res.send(group);
+        }
     });
 });
 // add group
-router.post('/add', (req, res) => {
-    group_service_1.addGroup(req.body).then((group, err) => {
-        if (err) {
-            return console.error(err);
+router.post('/add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let groupToAdd = yield groupService.getByName(req.body.name);
+    if (groupToAdd) {
+        res.status(406).send("Group with this name already exists");
+    }
+    else {
+        groupToAdd = req.body;
+        const fatherGroup = yield groupService.getByName(groupToAdd.fatherGroup);
+        if (groupToAdd.name === groupToAdd.fatherGroup) {
+            res.status(406).send("Group can't be a sub group of itself");
+        }
+        else if (groupToAdd.fatherGroup !== '' && !fatherGroup) {
+            res.status(406).send("Father group not found");
         }
         else {
-            group_service_1.addGroupToSub(req.body.fatherGroup, req.body.name).then((result, err) => {
+            groupToAdd.fatherGroup = groupToAdd.fatherGroup === '' ? 0 : fatherGroup._id;
+            groupService.addGroup(groupToAdd).then((group, err) => __awaiter(void 0, void 0, void 0, function* () {
                 if (err) {
-                    res.status(500).send(err.message);
+                    return console.error(err);
                 }
-                res.send(result);
-            });
+                else {
+                    if (groupToAdd.fatherGroup !== 0) {
+                        yield groupService.addGroupToSub(fatherGroup._id, group._id).then((result, err) => {
+                            if (err) {
+                                res.status(500).send(err.message);
+                            }
+                        });
+                    }
+                    res.send(group);
+                }
+            }));
         }
-    });
-});
+    }
+}));
 // delete group
-router.delete('/delete', (req, res) => {
-    group_service_1.deleteGroup(req.body).then((deleted, err) => {
-        if (err) {
-            res.status(500).send(err.message);
-        }
-        res.send(deleted);
-    });
-});
+router.delete('/delete', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const groupToDelete = yield groupService.getByName(req.body.name);
+    if (!groupToDelete) {
+        res.status(406).send("Group to delete not found");
+    }
+    else {
+        groupsDeleted = 0;
+        yield deleteGroupRec(groupToDelete._id);
+        res.send(groupsDeleted.toString());
+    }
+}));
 // add person to group
 router.post('/addPerson', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const groupName = req.body.groupName;
     const personData = req.body.personData;
-    console.log(req.body);
     const personToAdd = yield person_service_1.getByFirstNameAndLastName(personData.firstName, personData.lastName);
-    if (personToAdd) {
-        group_service_1.isPesronInGroup(groupName, personToAdd._id).then((user, err) => {
-            if (user) {
-                res.status(500).send("User already in group");
+    const group = yield groupService.getByName(groupName);
+    if (personToAdd && group) {
+        groupService.personInGroup(group._id, personToAdd._id).then((person, err) => {
+            if (person) {
+                res.status(406).send("Person already in group");
             }
             else {
-                group_service_1.addPersonToGroup(groupName, personToAdd._id).then((result, err) => {
+                groupService.addPersonToGroup(group._id, personToAdd._id).then((result, err) => {
                     if (err) {
                         res.status(500).send(err.message);
                     }
-                    res.send(result);
+                    res.send(personToAdd);
                 });
             }
         });
     }
     else {
-        res.status(500).send();
+        res.status(406).send("Person or group not found");
     }
 }));
 // remove person from the groups
-router.put('/removePerson', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/removePerson', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const groupName = req.body.groupName;
     const personData = req.body.personData;
     const personToDelete = yield person_service_1.getByFirstNameAndLastName(personData.firstName, personData.laseName);
-    group_service_1.removePersonFromGroup(groupName, personToDelete._id).then((result, err) => {
-        if (err) {
-            res.status(500).send(err.message);
-        }
-        res.send(result);
-    });
+    const group = yield groupService.getByName(groupName);
+    if (personToDelete && group) {
+        groupService.personInGroup(group._id, personToDelete._id).then((person, err) => {
+            if (!person) {
+                res.status(500).send("Person not in group");
+            }
+            else {
+                groupService.removePersonFromGroup(group._id, personToDelete._id).then((result, err) => {
+                    if (err) {
+                        res.status(500).send(err.message);
+                    }
+                    res.send(person);
+                });
+            }
+        });
+    }
+    else {
+        res.status(406).send("Person or group not found");
+    }
 }));
 // add group as sub group
-router.put('/addGroupToSub', (req, res) => {
-    group_service_1.addGroupToSub(req.body.groupName, req.body.subGroupName).then((result, err) => {
-        if (err) {
-            res.status(500).send(err.message);
+router.post('/addGroupToSub', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (req.body.groupName === req.body.subGroupName) {
+        res.status(406).send("Group can't be subGroup of itself");
+    }
+    const subGroupToAdd = yield groupService.getByName(req.body.subGroupName);
+    const fatherGroup = yield groupService.getByName(req.body.groupName);
+    if (subGroupToAdd && subGroupToAdd.fatherGroup !== 0) {
+        res.status(406).send(req.body.subGroupName + " is already a sub group");
+    }
+    else {
+        if (subGroupToAdd && fatherGroup) {
+            const subGroupInGroup = yield groupService.groupInGroup(fatherGroup._id, subGroupToAdd._id);
+            if (!subGroupInGroup) {
+                groupService.addGroupToSub(fatherGroup._id, subGroupToAdd._id).then((result, err) => __awaiter(void 0, void 0, void 0, function* () {
+                    if (err) {
+                        res.status(500).send(err.message);
+                    }
+                    yield groupService.addFatherGroup(subGroupToAdd.name, fatherGroup.name);
+                    res.send(subGroupToAdd);
+                }));
+            }
+            else {
+                res.status(406).send(`${subGroupToAdd.name} already sub group og ${fatherGroup.name}`);
+            }
         }
-        res.send(result);
-    });
-});
+        else {
+            res.status(406).send("Sub group or father group not found");
+        }
+    }
+}));
 // remove sub group
-router.put('/removeSub', (req, res) => {
-    group_service_1.removeSubGroup(req.body.groupName, req.body.subGroupName).then((result, err) => {
+router.post('/removeSub', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const fatherGroup = yield groupService.getByName(req.body.groupName);
+    if (!fatherGroup) {
+        res.status(406).send(req.body.groupName + " group not found");
+    }
+    const subGroupToRemove = yield groupService.getByName(req.body.subGroupName);
+    if (!subGroupToRemove) {
+        res.status(406).send(req.body.subGroupName + " not found");
+    }
+    if (subGroupToRemove && subGroupToRemove.fatherGroup !== fatherGroup._id) {
+        res.status(406).send(subGroupToRemove + " is not in " + fatherGroup.name);
+    }
+    else {
+        groupService.removeSubGroup(fatherGroup._id, subGroupToRemove._id).then((result, err) => __awaiter(void 0, void 0, void 0, function* () {
+            if (err) {
+                res.status(500).send(err.message);
+            }
+            yield groupService.removeFatherGroup(subGroupToRemove._id);
+            res.send(subGroupToRemove);
+        }));
+    }
+}));
+// get person in group
+router.get('/:groupName/:personName', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let names = req.params.personName.split(' ');
+    let firstName = names[0];
+    names.shift();
+    const group = yield groupService.getByName(req.params.groupName);
+    if (!group) {
+        res.status(406).send("Group not found");
+    }
+    const personToSearch = yield person_service_1.getByFirstNameAndLastName(firstName, names.join(' '));
+    if (!personToSearch) {
+        res.status(406).send("Person not found in DB");
+    }
+    groupService.personInGroup(group._id, personToSearch._id).then((person, err) => {
         if (err) {
-            res.status(500).send(err.message);
+            res.status(500).send();
         }
-        res.send(result);
+        if (!person) {
+            res.status(406).send("Person not found in group");
+        }
+        else {
+            res.send(personToSearch);
+        }
     });
+}));
+const deleteGroupRec = (groupID) => __awaiter(void 0, void 0, void 0, function* () {
+    groupsDeleted++;
+    let groupToDelete = yield groupService.getById(groupID);
+    let subGroupsArr = groupToDelete.subGroups;
+    if (subGroupsArr.length > 0) {
+        subGroupsArr.map(subGroup => {
+            deleteGroupRec(subGroup);
+        });
+    }
+    yield groupService.deleteGroup(groupToDelete._id);
 });
 module.exports = router;
 //# sourceMappingURL=group.router.js.map

@@ -4,7 +4,7 @@ export const getAll = () => {
     return personModel.find();
 }
 
-export const getById = (id: string) => {
+export const getById = (id: number) => {
     return personModel.findOne({_id: id});
 }
 

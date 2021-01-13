@@ -36,7 +36,7 @@ db.once("open", () => {
     });
 
     // text index for groups
-    db.collection('groups').createIndex({name: "text", fatherGroup: "text"});
+    db.collection('groups').createIndex({name: "text"});
 
     app.listen(port, () => {
         // tslint:disable-next-line:no-console
