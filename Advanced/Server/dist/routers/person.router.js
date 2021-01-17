@@ -64,23 +64,34 @@ router.put('/changePhone', (req, res) => {
     });
 });
 // delete person
-router.delete('/', (req, res) => {
-    return person_service_1.deletePerson(req.body).then((result, err) => {
+router.delete('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const personToDelete = yield person_service_1.getByFirstNameAndLastName(req.body.firstName, req.body.lastName);
+    person_service_1.deletePerson(personToDelete).then((result, err) => {
         if (err) {
             res.status(500).send(err.message);
         }
         else {
-            res.send(result);
+            group_service_1.personGroups(personToDelete._id).then((groups, err) => {
+                if (err) {
+                    res.status(500).send();
+                }
+                else {
+                    groups.forEach((group) => __awaiter(void 0, void 0, void 0, function* () {
+                        yield group_service_1.removePersonFromGroup(group._id, personToDelete._id);
+                    }));
+                    res.send(personToDelete);
+                }
+            });
         }
     });
-});
+}));
 // get persons' all groups
 router.get('/:fullName/groups', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let names = req.params.fullName.split(' ');
     let firstName = names[0];
     names.shift();
     const person = yield person_service_1.getByFirstNameAndLastName(firstName, names.join(' '));
-    group_service_1.presonGroups(person._id).then((groups, err) => {
+    group_service_1.personGroups(person._id).then((groups, err) => {
         if (err) {
             res.status(500).send();
         }

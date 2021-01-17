@@ -4,7 +4,7 @@ export const getAll = () => {
     return personModel.find();
 }
 
-export const getById = (id: number) => {
+export const getById = (id: string) => {
     return personModel.findOne({_id: id});
 }
 
@@ -17,5 +17,5 @@ export const addPerson = (newPerson: any) => {
 }
 
 export const deletePerson = (personToDelete: any) => {
-    return personModel.remove({ firstName:  personToDelete.firstName, lastName:personToDelete.lastName});
+    return personModel.deleteOne({ firstName:  personToDelete.firstName, lastName: personToDelete.lastName});
 }

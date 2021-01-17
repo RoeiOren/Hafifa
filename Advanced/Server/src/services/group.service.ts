@@ -4,7 +4,7 @@ export const getAll = () => {
     return groupModel.find();
 }
 
-export const getById = (id: number) => {
+export const getById = (id: string) => {
     return groupModel.findOne({_id: id});
 }
 
@@ -16,42 +16,42 @@ export const addGroup = (newGroup: any) => {
     return groupModel.create(newGroup);
 }
 
-export const deleteGroup = (groupID: number) => {
+export const deleteGroup = (groupID: string) => {
     return groupModel.deleteOne({_id: groupID});
 }
 
-export const addPersonToGroup = (groupID: number, personID: number) => {
+export const addPersonToGroup = (groupID: string, personID: string) => {
     return groupModel.updateOne({_id: groupID}, {$push: {persons: personID}});
 }
 
-export const removePersonFromGroup = (groupID: number, personID: number) => {
+export const removePersonFromGroup = (groupID: string, personID: string) => {
     return groupModel.updateOne({_id: groupID}, {$pull: {persons: personID}});
 }
 
-export const addGroupToSub = (groupID: number, subGroupID: number) => {
+export const addGroupToSub = (groupID: string, subGroupID: string) => {
     return groupModel.updateOne({_id: groupID}, {$push: {subGroups: subGroupID}});
 }
 
-export const removeSubGroup = (groupID: number, subGroupID: number) => {
+export const removeSubGroup = (groupID: string, subGroupID: string) => {
     return groupModel.updateOne({_id: groupID}, {$pull: {subGroups: subGroupID}});
 }
 
-export const personInGroup = (groupID: number, personID: number) => {
+export const personInGroup = (groupID: string, personID: string) => {
     return groupModel.findOne({_id: groupID, persons: personID});
 }
 
-export const groupInGroup = (groupID: number, subGroupID: number) => {
+export const groupInGroup = (groupID: string, subGroupID: string) => {
     return groupModel.findOne({_id: groupID, subGroups: subGroupID});
 }
 
-export const addFatherGroup = (groupID: number, fatherGroup: number) => {
+export const addFatherGroup = (groupID: string, fatherGroup: string) => {
     return groupModel.updateOne({_id: groupID}, {fatherGroup: fatherGroup});
 }
 
-export const removeFatherGroup = (groupID: number) => {
+export const removeFatherGroup = (groupID: string) => {
     return groupModel.updateOne({_id: groupID}, {fatherGroup: 0});
 }
 
-export const presonGroups = (personID: number) => {
+export const personGroups = (personID: string) => {
     return groupModel.find({persons: personID});
 }

@@ -1,6 +1,6 @@
 import express from "express";
 import { getAll, addPerson, deletePerson, getByFirstNameAndLastName } from "../services/person.service";
-import { presonGroups } from '../services/group.service';
+import { personGroups, removePersonFromGroup } from '../services/group.service';
 
 
 const router = express.Router();
@@ -60,12 +60,22 @@ router.put('/changePhone', (req, res) => {
 })
 
 // delete person
-router.delete('/', (req, res) => {
-    return deletePerson(req.body).then((result: any, err?: any) => {
+router.delete('/', async (req, res) => {
+    const personToDelete = await getByFirstNameAndLastName(req.body.firstName, req.body.lastName);
+    deletePerson(personToDelete).then((result: any, err?: any) => {
         if (err) {
             res.status(500).send(err.message);
         } else {
-            res.send(result);
+            personGroups(personToDelete._id).then((groups: any, err?: any) => {
+                if (err) { 
+                    res.status(500).send();
+                } else {
+                    groups.forEach(async (group: any) => {
+                        await removePersonFromGroup(group._id, personToDelete._id);
+                    })
+                    res.send(personToDelete);
+                }
+            })
         }
     });
 })
@@ -76,7 +86,7 @@ router.get('/:fullName/groups', async (req, res) => {
     let firstName = names[0];
     names.shift();
     const person = await getByFirstNameAndLastName(firstName, names.join(' '));
-    presonGroups(person._id).then((groups: any, err?: any) => {
+    personGroups(person._id).then((groups: any, err?: any) => {
         if (err) { 
             res.status(500).send();
         }

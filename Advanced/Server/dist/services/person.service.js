@@ -22,7 +22,7 @@ const addPerson = (newPerson) => {
 };
 exports.addPerson = addPerson;
 const deletePerson = (personToDelete) => {
-    return person_model_1.default.remove({ firstName: personToDelete.firstName, lastName: personToDelete.lastName });
+    return person_model_1.default.deleteOne({ firstName: personToDelete.firstName, lastName: personToDelete.lastName });
 };
 exports.deletePerson = deletePerson;
 //# sourceMappingURL=person.service.js.map

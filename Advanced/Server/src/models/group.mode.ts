@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const groupSchema = new mongoose.Schema(
   {
     name: String,
-    fatherGroup: String,
+    fatherGroup: Object,
     subGroups: Array,
     persons: Array
   },

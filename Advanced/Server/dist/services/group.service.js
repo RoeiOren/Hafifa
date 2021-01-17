@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.presonGroups = exports.removeFatherGroup = exports.addFatherGroup = exports.groupInGroup = exports.personInGroup = exports.removeSubGroup = exports.addGroupToSub = exports.removePersonFromGroup = exports.addPersonToGroup = exports.deleteGroup = exports.addGroup = exports.getByName = exports.getById = exports.getAll = void 0;
+exports.personGroups = exports.removeFatherGroup = exports.addFatherGroup = exports.groupInGroup = exports.personInGroup = exports.removeSubGroup = exports.addGroupToSub = exports.removePersonFromGroup = exports.addPersonToGroup = exports.deleteGroup = exports.addGroup = exports.getByName = exports.getById = exports.getAll = void 0;
 const group_mode_1 = __importDefault(require("../models/group.mode"));
 const getAll = () => {
     return group_mode_1.default.find();
@@ -57,8 +57,8 @@ const removeFatherGroup = (groupID) => {
     return group_mode_1.default.updateOne({ _id: groupID }, { fatherGroup: 0 });
 };
 exports.removeFatherGroup = removeFatherGroup;
-const presonGroups = (personID) => {
+const personGroups = (personID) => {
     return group_mode_1.default.find({ persons: personID });
 };
-exports.presonGroups = presonGroups;
+exports.personGroups = personGroups;
 //# sourceMappingURL=group.service.js.map

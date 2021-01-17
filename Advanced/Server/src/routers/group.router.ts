@@ -1,7 +1,7 @@
 import { AnyMxRecord } from "dns";
 import express from "express";
 import * as groupService from '../services/group.service';
-import { getByFirstNameAndLastName } from '../services/person.service';
+import * as personService from '../services/person.service';
 let groupsDeleted = 0;
 
 const router = express.Router();
@@ -37,7 +37,7 @@ router.get('/:name', (req, res) => {
 // add group
 router.post('/add', async (req, res) => {
     let groupToAdd: any = await groupService.getByName(req.body.name);
-    if (groupToAdd) { 
+    if (groupToAdd) {
         res.status(406).send("Group with this name already exists");
     } else {
         groupToAdd = req.body;
@@ -48,12 +48,12 @@ router.post('/add', async (req, res) => {
         } else if (groupToAdd.fatherGroup !== '' && !fatherGroup) {
             res.status(406).send("Father group not found");
         } else {
-            groupToAdd.fatherGroup = groupToAdd.fatherGroup === '' ? 0 : fatherGroup._id;
+            groupToAdd.fatherGroup = groupToAdd.fatherGroup === '' ? "0" : fatherGroup._id;
             groupService.addGroup(groupToAdd).then(async (group: any, err?: any) => {
                 if (err) {
                     return console.error(err);
                 } else {
-                    if (groupToAdd.fatherGroup !== 0) {
+                    if (groupToAdd.fatherGroup !== "0") {
                         await groupService.addGroupToSub(fatherGroup._id, group._id).then((result: any, err?: any) => {
                             if (err) {
                                 res.status(500).send(err.message);
@@ -75,6 +75,7 @@ router.delete('/delete', async (req, res) => {
     if (!groupToDelete) { 
         res.status(406).send("Group to delete not found");
     } else {
+        await groupService.removeSubGroup(groupToDelete.fatherGroup, groupToDelete._id);
         groupsDeleted = 0;
         await deleteGroupRec(groupToDelete._id);
         res.send(groupsDeleted.toString());
@@ -85,7 +86,7 @@ router.delete('/delete', async (req, res) => {
 router.post('/addPerson', async (req, res) => {
     const groupName = req.body.groupName;
     const personData = req.body.personData;
-    const personToAdd = await getByFirstNameAndLastName(personData.firstName, personData.lastName);
+    const personToAdd = await personService.getByFirstNameAndLastName(personData.firstName, personData.lastName);
     const group = await groupService.getByName(groupName);
     if (personToAdd && group) {
         groupService.personInGroup(group._id, personToAdd._id).then((person:any, err?: any) => {
@@ -110,11 +111,11 @@ router.post('/addPerson', async (req, res) => {
 router.post('/removePerson', async (req, res) => {
     const groupName = req.body.groupName;
     const personData = req.body.personData;
-    const personToDelete = await getByFirstNameAndLastName(personData.firstName, personData.laseName);
+    const personToDelete = await personService.getByFirstNameAndLastName(personData.firstName, personData.lastName);
     const group = await groupService.getByName(groupName);
     if (personToDelete && group) {
-        groupService.personInGroup(group._id, personToDelete._id).then((person:any, err?: any) => {
-            if (!person) { 
+        groupService.personInGroup(group._id, personToDelete._id).then((personsGroups:any, err?: any) => {
+            if (!personsGroups) { 
                 res.status(500).send("Person not in group");
             } else {
                 groupService.removePersonFromGroup(group._id, personToDelete._id).then((result: any, err?: any) => {
@@ -122,7 +123,7 @@ router.post('/removePerson', async (req, res) => {
                         res.status(500).send(err.message);
                     }
             
-                    res.send(person);
+                    res.send(personToDelete);
                 })
             }
         })
@@ -139,7 +140,7 @@ router.post('/addGroupToSub', async (req, res) => {
     
     const subGroupToAdd: any = await groupService.getByName(req.body.subGroupName);
     const fatherGroup: any = await groupService.getByName(req.body.groupName)
-    if (subGroupToAdd && subGroupToAdd.fatherGroup !== 0) {
+    if (subGroupToAdd && subGroupToAdd.fatherGroup !== "0") {
         res.status(406).send(req.body.subGroupName + " is already a sub group");
     } else {
         if (subGroupToAdd && fatherGroup) { 
@@ -154,7 +155,7 @@ router.post('/addGroupToSub', async (req, res) => {
                     res.send(subGroupToAdd);
                 })
             } else {
-                res.status(406).send(`${subGroupToAdd.name} already sub group og ${fatherGroup.name}`);
+                res.status(406).send(`${subGroupToAdd.name} already sub group of ${fatherGroup.name}`);
             }
         } else {
             res.status(406).send("Sub group or father group not found");
@@ -189,7 +190,7 @@ router.post('/removeSub', async (req, res) => {
 
 
 // get person in group
-router.get('/:groupName/:personName', async (req, res) => {
+router.get('/personInGroup/:groupName/:personName', async (req, res) => {
     let names = req.params.personName.split(' ');
     let firstName = names[0];
     names.shift();
@@ -199,7 +200,7 @@ router.get('/:groupName/:personName', async (req, res) => {
         res.status(406).send("Group not found");
     }
 
-    const personToSearch = await getByFirstNameAndLastName(firstName, names.join(' '));
+    const personToSearch = await personService.getByFirstNameAndLastName(firstName, names.join(' '));
     if (!personToSearch) { 
         res.status(406).send("Person not found in DB");
     }
@@ -219,7 +220,33 @@ router.get('/:groupName/:personName', async (req, res) => {
 })
 
 
-const deleteGroupRec = async (groupID: number) => {
+// get hierarchy of a groups
+router.get('/:groupName/hierarchy', async (req, res) => {
+    let group: any = await groupService.getByName(req.params.groupName);
+
+    if(!group) { 
+        res.status(406).send("Group " + req.params.groupName + " not found");
+    } else {
+    
+        let hierarchy = '';
+        let depth: number = await getGroupDepth(group);
+        if (group.fatherGroup !== '0') {
+            let fatherGroup = await groupService.getById(group.fatherGroup);
+            hierarchy = await getUpperGroups(fatherGroup, group.name, depth - 1);
+        }
+
+        hierarchy += await getLowerGroups(group, depth);
+
+        console.log(hierarchy);
+
+        res.send(hierarchy);
+    }
+
+})
+
+
+// Delete group and its' down hierarchy
+const deleteGroupRec = async (groupID: string) => {
     groupsDeleted++;
     let groupToDelete: any = await groupService.getById(groupID);
 
@@ -233,6 +260,81 @@ const deleteGroupRec = async (groupID: number) => {
 
     await groupService.deleteGroup(groupToDelete._id);
     
+}
+
+const getGroupDepth = async (group: any): Promise<number> => {
+    let depth = 0;
+    while(group.fatherGroup !== '0') { 
+        group = await groupService.getById(group.fatherGroup);
+        depth++;
+    }
+
+    return depth;
+}
+
+// Get upper groups in a group hierarchy
+const getUpperGroups = async (currGroup: any, prevGroupName: string, depth: number) => {
+    
+    let str: string = '';
+    if (currGroup.fatherGroup !== '0') {
+        let fatherGroup = await groupService.getById(currGroup.fatherGroup);
+        str = await getUpperGroups(fatherGroup, currGroup.name, depth - 1);
+    }
+
+    let personsArr: string[] = [];
+    for (const personID of currGroup.persons) { 
+        let currPerson: any = await personService.getById(personID);
+        personsArr.push(currPerson.firstName + " " + currPerson.lastName)
+    }
+
+    const tab = '\t';
+    str +=
+    `${tab.repeat(depth)}Group: ${currGroup.name}
+${tab.repeat(depth)}persons: ${personsArr.length ? personsArr.join(', ') : 'None'}
+${tab.repeat(depth)}subGroup: ${prevGroupName}\n\n`;
+
+    return str;
+}
+
+
+// Get lower groups in a group hierarchy
+const getLowerGroups = async (currGroup: any, depth: number) => {
+
+    // Sync loop
+    let personsArr: string[] = [];
+    for (const personID of currGroup.persons) { 
+        let currPerson: any = await personService.getById(personID);
+        personsArr.push(currPerson.firstName + " " + currPerson.lastName)
+    }
+
+    const tab = '\t';
+
+    let str =
+    `${tab.repeat(depth)}Group: ${currGroup.name}
+${tab.repeat(depth)}persons: ${personsArr.length ? personsArr.join(', ') : 'None'}
+${tab.repeat(depth)}subGroups: `;
+
+    // Sync loop
+    let subGroupsArr: any[] = [];
+    for (const subGroupID of currGroup.subGroups) { 
+        let currSubGroup: any = await groupService.getById(subGroupID);
+        subGroupsArr.push(currSubGroup);
+        str += currSubGroup.name + ", ";
+    }
+
+    if (subGroupsArr.length) { 
+        str = str.substring(0, str.length - 2);
+    } else { 
+        str += "None";
+    }
+
+    str += '\n\n';
+
+    for (const subGroup of subGroupsArr) {
+        str += await getLowerGroups(subGroup, depth + 1);
+    }
+
+    return str;
 }
 
 export = router;

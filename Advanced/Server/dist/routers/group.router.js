@@ -32,7 +32,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 const express_1 = __importDefault(require("express"));
 const groupService = __importStar(require("../services/group.service"));
-const person_service_1 = require("../services/person.service");
+const personService = __importStar(require("../services/person.service"));
 let groupsDeleted = 0;
 const router = express_1.default.Router();
 // get all groups
@@ -76,13 +76,13 @@ router.post('/add', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             res.status(406).send("Father group not found");
         }
         else {
-            groupToAdd.fatherGroup = groupToAdd.fatherGroup === '' ? 0 : fatherGroup._id;
+            groupToAdd.fatherGroup = groupToAdd.fatherGroup === '' ? "0" : fatherGroup._id;
             groupService.addGroup(groupToAdd).then((group, err) => __awaiter(void 0, void 0, void 0, function* () {
                 if (err) {
                     return console.error(err);
                 }
                 else {
-                    if (groupToAdd.fatherGroup !== 0) {
+                    if (groupToAdd.fatherGroup !== "0") {
                         yield groupService.addGroupToSub(fatherGroup._id, group._id).then((result, err) => {
                             if (err) {
                                 res.status(500).send(err.message);
@@ -102,6 +102,7 @@ router.delete('/delete', (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(406).send("Group to delete not found");
     }
     else {
+        yield groupService.removeSubGroup(groupToDelete.fatherGroup, groupToDelete._id);
         groupsDeleted = 0;
         yield deleteGroupRec(groupToDelete._id);
         res.send(groupsDeleted.toString());
@@ -111,7 +112,7 @@ router.delete('/delete', (req, res) => __awaiter(void 0, void 0, void 0, functio
 router.post('/addPerson', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const groupName = req.body.groupName;
     const personData = req.body.personData;
-    const personToAdd = yield person_service_1.getByFirstNameAndLastName(personData.firstName, personData.lastName);
+    const personToAdd = yield personService.getByFirstNameAndLastName(personData.firstName, personData.lastName);
     const group = yield groupService.getByName(groupName);
     if (personToAdd && group) {
         groupService.personInGroup(group._id, personToAdd._id).then((person, err) => {
@@ -136,11 +137,11 @@ router.post('/addPerson', (req, res) => __awaiter(void 0, void 0, void 0, functi
 router.post('/removePerson', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const groupName = req.body.groupName;
     const personData = req.body.personData;
-    const personToDelete = yield person_service_1.getByFirstNameAndLastName(personData.firstName, personData.laseName);
+    const personToDelete = yield personService.getByFirstNameAndLastName(personData.firstName, personData.lastName);
     const group = yield groupService.getByName(groupName);
     if (personToDelete && group) {
-        groupService.personInGroup(group._id, personToDelete._id).then((person, err) => {
-            if (!person) {
+        groupService.personInGroup(group._id, personToDelete._id).then((personsGroups, err) => {
+            if (!personsGroups) {
                 res.status(500).send("Person not in group");
             }
             else {
@@ -148,7 +149,7 @@ router.post('/removePerson', (req, res) => __awaiter(void 0, void 0, void 0, fun
                     if (err) {
                         res.status(500).send(err.message);
                     }
-                    res.send(person);
+                    res.send(personToDelete);
                 });
             }
         });
@@ -164,7 +165,7 @@ router.post('/addGroupToSub', (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
     const subGroupToAdd = yield groupService.getByName(req.body.subGroupName);
     const fatherGroup = yield groupService.getByName(req.body.groupName);
-    if (subGroupToAdd && subGroupToAdd.fatherGroup !== 0) {
+    if (subGroupToAdd && subGroupToAdd.fatherGroup !== "0") {
         res.status(406).send(req.body.subGroupName + " is already a sub group");
     }
     else {
@@ -212,7 +213,7 @@ router.post('/removeSub', (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 }));
 // get person in group
-router.get('/:groupName/:personName', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get('/personInGroup/:groupName/:personName', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let names = req.params.personName.split(' ');
     let firstName = names[0];
     names.shift();
@@ -220,7 +221,7 @@ router.get('/:groupName/:personName', (req, res) => __awaiter(void 0, void 0, vo
     if (!group) {
         res.status(406).send("Group not found");
     }
-    const personToSearch = yield person_service_1.getByFirstNameAndLastName(firstName, names.join(' '));
+    const personToSearch = yield personService.getByFirstNameAndLastName(firstName, names.join(' '));
     if (!personToSearch) {
         res.status(406).send("Person not found in DB");
     }
@@ -236,6 +237,24 @@ router.get('/:groupName/:personName', (req, res) => __awaiter(void 0, void 0, vo
         }
     });
 }));
+// get hierarchy of a groups
+router.get('/:groupName/hierarchy', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let group = yield groupService.getByName(req.params.groupName);
+    if (!group) {
+        res.status(406).send("Group " + req.params.groupName + " not found");
+    }
+    else {
+        let hierarchy = '';
+        let depth = yield getGroupDepth(group);
+        if (group.fatherGroup !== '0') {
+            let fatherGroup = yield groupService.getById(group.fatherGroup);
+            hierarchy = yield getUpperGroups(fatherGroup, group.name, depth - 1);
+        }
+        hierarchy += yield getLowerGroups(group, depth);
+        console.log(hierarchy);
+        res.send(hierarchy);
+    }
+}));
 const deleteGroupRec = (groupID) => __awaiter(void 0, void 0, void 0, function* () {
     groupsDeleted++;
     let groupToDelete = yield groupService.getById(groupID);
@@ -246,6 +265,62 @@ const deleteGroupRec = (groupID) => __awaiter(void 0, void 0, void 0, function* 
         });
     }
     yield groupService.deleteGroup(groupToDelete._id);
+});
+const getGroupDepth = (group) => __awaiter(void 0, void 0, void 0, function* () {
+    let depth = 0;
+    while (group.fatherGroup !== '0') {
+        group = yield groupService.getById(group.fatherGroup);
+        depth++;
+    }
+    return depth;
+});
+const getUpperGroups = (currGroup, prevGroupName, depth) => __awaiter(void 0, void 0, void 0, function* () {
+    let str = '';
+    if (currGroup.fatherGroup !== '0') {
+        let fatherGroup = yield groupService.getById(currGroup.fatherGroup);
+        str = yield getUpperGroups(fatherGroup, currGroup.name, depth - 1);
+    }
+    let personsArr = [];
+    for (const personID of currGroup.persons) {
+        let currPerson = yield personService.getById(personID);
+        personsArr.push(currPerson.firstName + " " + currPerson.lastName);
+    }
+    const tab = '\t';
+    str +=
+        `${tab.repeat(depth)}Group: ${currGroup.name}
+${tab.repeat(depth)}persons: ${personsArr.length ? personsArr.join(', ') : 'None'}
+${tab.repeat(depth)}subGroup: ${prevGroupName}\n\n`;
+    return str;
+});
+const getLowerGroups = (currGroup, depth) => __awaiter(void 0, void 0, void 0, function* () {
+    // Sync loop
+    let personsArr = [];
+    for (const personID of currGroup.persons) {
+        let currPerson = yield personService.getById(personID);
+        personsArr.push(currPerson.firstName + " " + currPerson.lastName);
+    }
+    const tab = '\t';
+    let str = `${tab.repeat(depth)}Group: ${currGroup.name}
+${tab.repeat(depth)}persons: ${personsArr.length ? personsArr.join(', ') : 'None'}
+${tab.repeat(depth)}subGroups: `;
+    // Sync loop
+    let subGroupsArr = [];
+    for (const subGroupID of currGroup.subGroups) {
+        let currSubGroup = yield groupService.getById(subGroupID);
+        subGroupsArr.push(currSubGroup);
+        str += currSubGroup.name + ", ";
+    }
+    if (subGroupsArr.length) {
+        str = str.substring(0, str.length - 2);
+    }
+    else {
+        str += "None";
+    }
+    str += '\n\n';
+    for (const subGroup of subGroupsArr) {
+        str += yield getLowerGroups(subGroup, depth + 1);
+    }
+    return str;
 });
 module.exports = router;
 //# sourceMappingURL=group.router.js.map
