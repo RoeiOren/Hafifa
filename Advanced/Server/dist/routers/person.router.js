@@ -21,7 +21,9 @@ router.get('/', (req, res) => {
         if (err) {
             res.status(500).send(err.message);
         }
-        res.send(persons);
+        else {
+            res.send(persons);
+        }
     });
 });
 // get by name
@@ -33,23 +35,39 @@ router.get('/:fullName', (req, res) => {
         if (err) {
             res.status(500).send(err.message);
         }
-        if (!person) {
-            res.status(406).send("Person not found");
+        else {
+            if (!person) {
+                res.status(406).send("Person not found");
+            }
+            else {
+                res.send(person);
+            }
         }
-        res.send(person);
     });
 });
 // add person
-router.post('/', (req, res) => {
-    person_service_1.addPerson(req.body).then((person, err) => {
-        if (err) {
-            res.status(500).send(err.message);
+router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let person = yield person_service_1.getByFirstNameAndLastName(req.body.firstName, req.body.lastName);
+    if (person) {
+        res.status(406).send("Person with this name already exists");
+    }
+    else {
+        person = yield person_service_1.getByPhoneNumber(req.body.phoneNumber);
+        if (person) {
+            res.status(406).send("Phone number already taken");
         }
         else {
-            res.send(person);
+            person_service_1.addPerson(req.body).then((person, err) => {
+                if (err) {
+                    res.status(500).send(err.message);
+                }
+                else {
+                    res.send(person);
+                }
+            });
         }
-    });
-});
+    }
+}));
 // update person
 router.put('/changePhone', (req, res) => {
     person_service_1.getByFirstNameAndLastName(req.body.firstName, req.body.lastName).then((person, err) => {
@@ -64,8 +82,11 @@ router.put('/changePhone', (req, res) => {
     });
 });
 // delete person
-router.delete('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const personToDelete = yield person_service_1.getByFirstNameAndLastName(req.body.firstName, req.body.lastName);
+router.delete('/:fullName', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let names = req.params.fullName.split(' ');
+    let firstName = names[0];
+    names.shift();
+    const personToDelete = yield person_service_1.getByFirstNameAndLastName(firstName, names.join(' '));
     person_service_1.deletePerson(personToDelete).then((result, err) => {
         if (err) {
             res.status(500).send(err.message);

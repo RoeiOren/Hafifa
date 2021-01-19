@@ -52,16 +52,18 @@ router.get('/:name', (req, res) => {
         if (err) {
             res.status(500).send(err.message);
         }
-        if (!group) {
-            res.status(406).send("Group not found");
-        }
         else {
-            res.send(group);
+            if (!group) {
+                res.status(406).send("Group not found");
+            }
+            else {
+                res.send(group);
+            }
         }
     });
 });
 // add group
-router.post('/add', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let groupToAdd = yield groupService.getByName(req.body.name);
     if (groupToAdd) {
         res.status(406).send("Group with this name already exists");
@@ -76,13 +78,13 @@ router.post('/add', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
             res.status(406).send("Father group not found");
         }
         else {
-            groupToAdd.fatherGroup = groupToAdd.fatherGroup === '' ? "0" : fatherGroup._id;
+            groupToAdd.fatherGroup = groupToAdd.fatherGroup === '' ? "None" : fatherGroup._id;
             groupService.addGroup(groupToAdd).then((group, err) => __awaiter(void 0, void 0, void 0, function* () {
                 if (err) {
                     return console.error(err);
                 }
                 else {
-                    if (groupToAdd.fatherGroup !== "0") {
+                    if (groupToAdd.fatherGroup !== "None") {
                         yield groupService.addGroupToSub(fatherGroup._id, group._id).then((result, err) => {
                             if (err) {
                                 res.status(500).send(err.message);
@@ -96,20 +98,22 @@ router.post('/add', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 }));
 // delete group
-router.delete('/delete', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const groupToDelete = yield groupService.getByName(req.body.name);
+router.delete('/:name', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const groupToDelete = yield groupService.getByName(req.params.name);
     if (!groupToDelete) {
         res.status(406).send("Group to delete not found");
     }
     else {
-        yield groupService.removeSubGroup(groupToDelete.fatherGroup, groupToDelete._id);
+        if (groupToDelete.fatherGroup !== 'None') {
+            yield groupService.removeSubGroup(groupToDelete.fatherGroup, groupToDelete._id);
+        }
         groupsDeleted = 0;
         yield deleteGroupRec(groupToDelete._id);
         res.send(groupsDeleted.toString());
     }
 }));
 // add person to group
-router.post('/addPerson', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/person', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const groupName = req.body.groupName;
     const personData = req.body.personData;
     const personToAdd = yield personService.getByFirstNameAndLastName(personData.firstName, personData.lastName);
@@ -142,7 +146,7 @@ router.post('/removePerson', (req, res) => __awaiter(void 0, void 0, void 0, fun
     if (personToDelete && group) {
         groupService.personInGroup(group._id, personToDelete._id).then((personsGroups, err) => {
             if (!personsGroups) {
-                res.status(500).send("Person not in group");
+                res.status(406).send("Person not in group");
             }
             else {
                 groupService.removePersonFromGroup(group._id, personToDelete._id).then((result, err) => {
@@ -159,7 +163,7 @@ router.post('/removePerson', (req, res) => __awaiter(void 0, void 0, void 0, fun
     }
 }));
 // add group as sub group
-router.post('/addGroupToSub', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/subGroup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.body.groupName === req.body.subGroupName) {
         res.status(406).send("Group can't be subGroup of itself");
     }
@@ -181,7 +185,7 @@ router.post('/addGroupToSub', (req, res) => __awaiter(void 0, void 0, void 0, fu
                 }));
             }
             else {
-                res.status(406).send(`${subGroupToAdd.name} already sub group og ${fatherGroup.name}`);
+                res.status(406).send(`${subGroupToAdd.name} already sub group of ${fatherGroup.name}`);
             }
         }
         else {
@@ -190,7 +194,7 @@ router.post('/addGroupToSub', (req, res) => __awaiter(void 0, void 0, void 0, fu
     }
 }));
 // remove sub group
-router.post('/removeSub', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/removeSubGroup', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const fatherGroup = yield groupService.getByName(req.body.groupName);
     if (!fatherGroup) {
         res.status(406).send(req.body.groupName + " group not found");
@@ -246,7 +250,7 @@ router.get('/:groupName/hierarchy', (req, res) => __awaiter(void 0, void 0, void
     else {
         let hierarchy = '';
         let depth = yield getGroupDepth(group);
-        if (group.fatherGroup !== '0') {
+        if (group.fatherGroup !== 'None') {
             let fatherGroup = yield groupService.getById(group.fatherGroup);
             hierarchy = yield getUpperGroups(fatherGroup, group.name, depth - 1);
         }
@@ -255,6 +259,7 @@ router.get('/:groupName/hierarchy', (req, res) => __awaiter(void 0, void 0, void
         res.send(hierarchy);
     }
 }));
+// Delete group and its' down hierarchy
 const deleteGroupRec = (groupID) => __awaiter(void 0, void 0, void 0, function* () {
     groupsDeleted++;
     let groupToDelete = yield groupService.getById(groupID);
@@ -268,15 +273,16 @@ const deleteGroupRec = (groupID) => __awaiter(void 0, void 0, void 0, function* 
 });
 const getGroupDepth = (group) => __awaiter(void 0, void 0, void 0, function* () {
     let depth = 0;
-    while (group.fatherGroup !== '0') {
+    while (group.fatherGroup !== 'None') {
         group = yield groupService.getById(group.fatherGroup);
         depth++;
     }
     return depth;
 });
+// Get upper groups in a group hierarchy
 const getUpperGroups = (currGroup, prevGroupName, depth) => __awaiter(void 0, void 0, void 0, function* () {
     let str = '';
-    if (currGroup.fatherGroup !== '0') {
+    if (currGroup.fatherGroup !== 'None') {
         let fatherGroup = yield groupService.getById(currGroup.fatherGroup);
         str = yield getUpperGroups(fatherGroup, currGroup.name, depth - 1);
     }
@@ -292,6 +298,7 @@ ${tab.repeat(depth)}persons: ${personsArr.length ? personsArr.join(', ') : 'None
 ${tab.repeat(depth)}subGroup: ${prevGroupName}\n\n`;
     return str;
 });
+// Get lower groups in a group hierarchy
 const getLowerGroups = (currGroup, depth) => __awaiter(void 0, void 0, void 0, function* () {
     // Sync loop
     let personsArr = [];

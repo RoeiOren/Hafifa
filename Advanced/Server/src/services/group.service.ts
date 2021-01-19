@@ -1,4 +1,4 @@
-import groupModel from '../models/group.mode';
+import groupModel from '../models/group.model';
 
 export const getAll = () => {
     return groupModel.find();
