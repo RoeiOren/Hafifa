@@ -26,65 +26,65 @@ test("GET /persons - success", async () => {
   expect(body.length).toEqual(EXPECTED.length);
 });
 
-// test("GET person by name - success", async () => {
-//   const { body } = await request(app).get("/persons/Roei Oren").expect(200);
-// })
+test("GET person by name - success", async () => {
+  const { body } = await request(app).get("/persons/Roei Oren").expect(200);
+})
 
-// test ('GET person by name - not found', async () => {
-//   const { body } = await request(app).get('/persons/a b').expect(406);
-//   expect(body).toEqual({});
-// })
+test ('GET person by name - not found', async () => {
+  const { body } = await request(app).get('/persons/a b').expect(406);
+  expect(body).toEqual({});
+})
 
-// test('POST /persons - success ', async () => {
+test('POST /persons - success ', async () => {
 
-//   let before = await personService.getAll();
-//   before = before.length;
+  let before = await personService.getAll();
+  before = before.length;
 
-//   let newPerson = {
-//     firstName: "A",
-//     lastName: "b",
-//     phoneNumber: "0521234567"
-//   }
+  let newPerson = {
+    firstName: "A",
+    lastName: "b",
+    phoneNumber: "0521234567"
+  }
 
-//   await request(app).post('/persons').type('form').set('Content-Type', 'application/json')
-//     .set('Accept', /application\/json/).send(newPerson).expect(200);
+  await request(app).post('/persons').type('form').set('Content-Type', 'application/json')
+    .set('Accept', /application\/json/).send(newPerson).expect(200);
 
-//   let after = await personService.getAll();
-//   after = after.length;
+  let after = await personService.getAll();
+  after = after.length;
 
-//   expect(after).toBe(before + 1);
-// })
+  expect(after).toBe(before + 1);
+})
 
-// test('POST /persons - fail ', async () => {
+test('POST /persons - fail ', async () => {
 
-//   let before = await personService.getAll();
-//   before = before.length;
+  let before = await personService.getAll();
+  before = before.length;
 
-//   let newPerson = {
-//     firstName: "A",
-//     lastName: "b",
-//     phoneNumber: "0521234569"
-//   }
+  let newPerson = {
+    firstName: "A",
+    lastName: "b",
+    phoneNumber: "0521234569"
+  }
 
-//   await request(app).post('/persons').type('form').set('Content-Type', 'application/json')
-//     .set('Accept', /application\/json/).send(newPerson).expect(406);
+  await request(app).post('/persons').type('form').set('Content-Type', 'application/json')
+    .set('Accept', /application\/json/).send(newPerson).expect(406);
 
-//   let after = await personService.getAll();
-//   after = after.length;
+  let after = await personService.getAll();
+  after = after.length;
 
-//   expect(after).toBe(before);
-// })
+  expect(after).toBe(before);
+})
 
-// test("DELETE /persons", async () => {
+test("DELETE /persons", async () => {
 
-//   let before = await personService.getAll();
-//   before = before.length;
+  let before = await personService.getAll();
+  before = before.length;
 
-//   await request(app).delete('/persons/A b').expect(200);
+  await request(app).delete('/persons/A b').expect(200);
   
-//   let after = await personService.getAll();
-//   after = after.length;
+  let after = await personService.getAll();
+  after = after.length;
 
-//   expect(after).toBe(before - 1);
+  expect(after).toBe(before - 1);
 
-// })
+})
