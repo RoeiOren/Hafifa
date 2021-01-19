@@ -22,19 +22,19 @@ const db = mongoose.connection;
 
 jest.setTimeout(30000)
 
-// test('GET /groups - success', async () => {
-//     const EXPECTED = await groupService.getAll();
-//     const { body } = await request(app).get("/groups").expect(200); //uses the request function that calls on express app instance
-//     expect(body.length).toEqual(EXPECTED.length);
-// })
+test('GET /groups - success', async () => {
+    const EXPECTED = await groupService.getAll();
+    const { body } = await request(app).get("/groups").expect(200); //uses the request function that calls on express app instance
+    expect(body.length).toEqual(EXPECTED.length);
+})
 
-// test('GET /groups/:name - sucess', async () => {
-//     await request(app).get('/groups/3').expect(200);
-// })
+test('GET /groups/:name - sucess', async () => {
+    await request(app).get('/groups/3').expect(200);
+})
 
-// test('GET /groups/:name - fail', async () => {
-//     await request(app).get('/groups/20').expect(406);
-// })
+test('GET /groups/:name - fail', async () => {
+    await request(app).get('/groups/20').expect(406);
+})
 
 test('POST /groups - success', async () => {
     let before = await groupService.getAll();
