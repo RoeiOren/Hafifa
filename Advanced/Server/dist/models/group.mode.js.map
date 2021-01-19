@@ -1,0 +1,1 @@
+{"version":3,"file":"group.mode.js","sourceRoot":"","sources":["../../src/models/group.mode.ts"],"names":[],"mappings":";;;;AAAA,wDAAgC;AAEhC,MAAM,WAAW,GAAG,IAAI,kBAAQ,CAAC,MAAM,CACrC;IACE,IAAI,EAAE,MAAM;IACZ,WAAW,EAAE,MAAM;IACnB,SAAS,EAAE,KAAK;IAChB,OAAO,EAAE,KAAK;CACf,EACD;IACE,UAAU,EAAE,QAAQ;CACrB,CACF,CAAC;AAEF,iBAAS,kBAAQ,CAAC,KAAK,CAAC,QAAQ,EAAE,WAAW,CAAC,CAAC"}
