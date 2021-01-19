@@ -19,3 +19,7 @@ export const addPerson = (newPerson: any) => {
 export const deletePerson = (personToDelete: any) => {
     return personModel.deleteOne({ firstName:  personToDelete.firstName, lastName: personToDelete.lastName});
 }
+
+export const getByPhoneNumber = (phoneNumber: string) => {
+    return personModel.findOne({phoneNumber: phoneNumber});
+}

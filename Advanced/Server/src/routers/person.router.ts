@@ -1,5 +1,5 @@
 import express from "express";
-import { getAll, addPerson, deletePerson, getByFirstNameAndLastName } from "../services/person.service";
+import { getAll, addPerson, deletePerson, getByFirstNameAndLastName, getByPhoneNumber } from "../services/person.service";
 import { personGroups, removePersonFromGroup } from '../services/group.service';
 
 
@@ -11,9 +11,10 @@ router.get('/', (req, res) => {
     getAll().then((persons: any, err?: any): void => {
         if (err) {
             res.status(500).send(err.message);
+        } else {
+            res.send(persons);
         }
 
-        res.send(persons);
     })
 })
 
@@ -25,25 +26,37 @@ router.get('/:fullName', (req, res) => {
     getByFirstNameAndLastName(firstName, names.join(' ')).then((person: any, err?: any) => {
         if (err) {
             res.status(500).send(err.message);
+        } else {
+            if (!person) { 
+                res.status(406).send("Person not found");
+            } else {
+                res.send(person);
+            }
         }
     
-        if (!person) { 
-            res.status(406).send("Person not found");
-        }
 
-        res.send(person);
     })
 })
 
 // add person
-router.post('/', (req, res) => {
-    addPerson(req.body).then((person: any, err?: any) => {
-        if (err) {
-            res.status(500).send(err.message);
+router.post('/', async (req, res) => {
+    let person = await getByFirstNameAndLastName(req.body.firstName, req.body.lastName);
+    if (person) {
+        res.status(406).send("Person with this name already exists");
+    } else {
+        person = await getByPhoneNumber(req.body.phoneNumber);
+        if (person) { 
+            res.status(406).send("Phone number already taken");
         } else {
-            res.send(person);
+            addPerson(req.body).then((person: any, err?: any) => {
+                if (err) {
+                    res.status(500).send(err.message);
+                } else {
+                    res.send(person);
+                }
+            })
         }
-    })
+    }
 })
 
 // update person
@@ -60,8 +73,11 @@ router.put('/changePhone', (req, res) => {
 })
 
 // delete person
-router.delete('/', async (req, res) => {
-    const personToDelete = await getByFirstNameAndLastName(req.body.firstName, req.body.lastName);
+router.delete('/:fullName', async (req, res) => {
+    let names = req.params.fullName.split(' ');
+    let firstName = names[0];
+    names.shift();
+    const personToDelete = await getByFirstNameAndLastName(firstName, names.join(' '));
     deletePerson(personToDelete).then((result: any, err?: any) => {
         if (err) {
             res.status(500).send(err.message);
@@ -69,7 +85,7 @@ router.delete('/', async (req, res) => {
             personGroups(personToDelete._id).then((groups: any, err?: any) => {
                 if (err) { 
                     res.status(500).send();
-                } else {
+                } else {                    
                     groups.forEach(async (group: any) => {
                         await removePersonFromGroup(group._id, personToDelete._id);
                     })

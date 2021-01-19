@@ -1,4 +1,3 @@
-import { AnyMxRecord } from "dns";
 import express from "express";
 import * as groupService from '../services/group.service';
 import * as personService from '../services/person.service';
@@ -23,19 +22,20 @@ router.get('/:name', (req, res) => {
     groupService.getByName(req.params.name).then((group: any, err?: any) => {
         if (err) {
             res.status(500).send(err.message);
+        } else {
+            if (!group) { 
+                res.status(406).send("Group not found");
+            } else {
+                res.send(group);
+            }
         }
 
-        if (!group) { 
-            res.status(406).send("Group not found");
-        } else {
-            res.send(group);
-        }
 
     })
 })
 
 // add group
-router.post('/add', async (req, res) => {
+router.post('/', async (req, res) => {
     let groupToAdd: any = await groupService.getByName(req.body.name);
     if (groupToAdd) {
         res.status(406).send("Group with this name already exists");
@@ -48,12 +48,12 @@ router.post('/add', async (req, res) => {
         } else if (groupToAdd.fatherGroup !== '' && !fatherGroup) {
             res.status(406).send("Father group not found");
         } else {
-            groupToAdd.fatherGroup = groupToAdd.fatherGroup === '' ? "0" : fatherGroup._id;
+            groupToAdd.fatherGroup = groupToAdd.fatherGroup === '' ? "None" : fatherGroup._id;
             groupService.addGroup(groupToAdd).then(async (group: any, err?: any) => {
                 if (err) {
                     return console.error(err);
                 } else {
-                    if (groupToAdd.fatherGroup !== "0") {
+                    if (groupToAdd.fatherGroup !== "None") {
                         await groupService.addGroupToSub(fatherGroup._id, group._id).then((result: any, err?: any) => {
                             if (err) {
                                 res.status(500).send(err.message);
@@ -70,12 +70,14 @@ router.post('/add', async (req, res) => {
 })
 
 // delete group
-router.delete('/delete', async (req, res) => {
-    const groupToDelete: any = await groupService.getByName(req.body.name);
+router.delete('/:name', async (req, res) => {
+    const groupToDelete: any = await groupService.getByName(req.params.name);
     if (!groupToDelete) { 
         res.status(406).send("Group to delete not found");
     } else {
-        await groupService.removeSubGroup(groupToDelete.fatherGroup, groupToDelete._id);
+        if (groupToDelete.fatherGroup !== 'None') { 
+            await groupService.removeSubGroup(groupToDelete.fatherGroup, groupToDelete._id);
+        }
         groupsDeleted = 0;
         await deleteGroupRec(groupToDelete._id);
         res.send(groupsDeleted.toString());
@@ -83,7 +85,7 @@ router.delete('/delete', async (req, res) => {
 })
 
 // add person to group
-router.post('/addPerson', async (req, res) => {
+router.post('/person', async (req, res) => {
     const groupName = req.body.groupName;
     const personData = req.body.personData;
     const personToAdd = await personService.getByFirstNameAndLastName(personData.firstName, personData.lastName);
@@ -116,7 +118,7 @@ router.post('/removePerson', async (req, res) => {
     if (personToDelete && group) {
         groupService.personInGroup(group._id, personToDelete._id).then((personsGroups:any, err?: any) => {
             if (!personsGroups) { 
-                res.status(500).send("Person not in group");
+                res.status(406).send("Person not in group");
             } else {
                 groupService.removePersonFromGroup(group._id, personToDelete._id).then((result: any, err?: any) => {
                     if (err) {
@@ -133,7 +135,7 @@ router.post('/removePerson', async (req, res) => {
 })
 
 // add group as sub group
-router.post('/addGroupToSub', async (req, res) => {
+router.post('/subGroup', async (req, res) => {
     if (req.body.groupName === req.body.subGroupName) { 
         res.status(406).send("Group can't be subGroup of itself");
     }
@@ -164,7 +166,7 @@ router.post('/addGroupToSub', async (req, res) => {
 })
 
 // remove sub group
-router.post('/removeSub', async (req, res) => {
+router.post('/removeSubGroup', async (req, res) => {
     const fatherGroup: any = await groupService.getByName(req.body.groupName);
     if (!fatherGroup) {
         res.status(406).send(req.body.groupName + " group not found");
@@ -230,7 +232,7 @@ router.get('/:groupName/hierarchy', async (req, res) => {
     
         let hierarchy = '';
         let depth: number = await getGroupDepth(group);
-        if (group.fatherGroup !== '0') {
+        if (group.fatherGroup !== 'None') {
             let fatherGroup = await groupService.getById(group.fatherGroup);
             hierarchy = await getUpperGroups(fatherGroup, group.name, depth - 1);
         }
@@ -264,7 +266,7 @@ const deleteGroupRec = async (groupID: string) => {
 
 const getGroupDepth = async (group: any): Promise<number> => {
     let depth = 0;
-    while(group.fatherGroup !== '0') { 
+    while(group.fatherGroup !== 'None') { 
         group = await groupService.getById(group.fatherGroup);
         depth++;
     }
@@ -276,7 +278,7 @@ const getGroupDepth = async (group: any): Promise<number> => {
 const getUpperGroups = async (currGroup: any, prevGroupName: string, depth: number) => {
     
     let str: string = '';
-    if (currGroup.fatherGroup !== '0') {
+    if (currGroup.fatherGroup !== 'None') {
         let fatherGroup = await groupService.getById(currGroup.fatherGroup);
         str = await getUpperGroups(fatherGroup, currGroup.name, depth - 1);
     }
